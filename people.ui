@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>People</class>
+ <widget class="QDialog" name="People">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1071</width>
+    <height>630</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QTableView" name="tableView">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>90</y>
+     <width>721</width>
+     <height>501</height>
+    </rect>
+   </property>
+   <property name="alternatingRowColors">
+    <bool>true</bool>
+   </property>
+   <property name="sortingEnabled">
+    <bool>true</bool>
+   </property>
+   <attribute name="horizontalHeaderStretchLastSection">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>301</width>
+     <height>571</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Ingresar Informacion personal</string>
+   </property>
+   <widget class="QLabel" name="label_status">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>580</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>status</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>22</y>
+      <width>276</width>
+      <height>531</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Rut:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="6">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Nombres:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="6">
+      <widget class="QLineEdit" name="lineEdit_rut"/>
+     </item>
+     <item row="1" column="6">
+      <widget class="QLineEdit" name="lineEdit_names"/>
+     </item>
+     <item row="2" column="0" colspan="4">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Apellido Paterno:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="6">
+      <widget class="QLabel" name="label_13">
+       <property name="text">
+        <string>Apellido Materno:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="6">
+      <widget class="QLineEdit" name="lineEdit_paternal_surname"/>
+     </item>
+     <item row="3" column="6">
+      <widget class="QLineEdit" name="lineEdit_maternal_surname"/>
+     </item>
+     <item row="4" column="0" colspan="5">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Fecha Nacimiento:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="6">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Nacionalidad:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
+      <widget class="QDateEdit" name="dateEdit_birthdate">
+       <property name="displayFormat">
+        <string>dd/MM/yy</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="6">
+      <widget class="QComboBox" name="comboBox_nationality"/>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>Email:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="6">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Teléfono:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="6">
+      <widget class="QLineEdit" name="lineEdit_email"/>
+     </item>
+     <item row="7" column="6">
+      <widget class="QLineEdit" name="lineEdit_cellphone"/>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Empresa:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0" colspan="7">
+      <widget class="QComboBox" name="comboBox_company">
+       <property name="maxVisibleItems">
+        <number>20</number>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="0">
+      <widget class="QLabel" name="label_17">
+       <property name="text">
+        <string>Cargo:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="0" colspan="7">
+      <widget class="QComboBox" name="comboBox_position">
+       <property name="maxVisibleItems">
+        <number>20</number>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="0">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>Perfil:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="0" colspan="7">
+      <widget class="QComboBox" name="comboBox_profile"/>
+     </item>
+     <item row="14" column="0">
+      <widget class="QLabel" name="label_12">
+       <property name="text">
+        <string>Estado:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="15" column="0" colspan="7">
+      <widget class="QComboBox" name="comboBox_state">
+       <property name="currentText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="16" column="0">
+      <widget class="QLabel" name="label_14">
+       <property name="text">
+        <string>Frecuencia</string>
+       </property>
+      </widget>
+     </item>
+     <item row="17" column="0" colspan="7">
+      <widget class="QComboBox" name="comboBox_frequency"/>
+     </item>
+     <item row="19" column="6">
+      <widget class="QDateEdit" name="dateEdit_end">
+       <property name="displayFormat">
+        <string>yyyy-MM-dd</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="0" colspan="7">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Fecha autorizada:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="0" colspan="7">
+      <widget class="QLabel" name="label_8">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>Horario autorizado:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="6">
+      <widget class="QTimeEdit" name="timeEdit_end">
+       <property name="displayFormat">
+        <string>HH:mm</string>
+       </property>
+      </widget>
+     </item>
+     <item row="22" column="6">
+      <widget class="QPushButton" name="pushButton_update">
+       <property name="text">
+        <string>Actualizar</string>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="5">
+      <widget class="QLabel" name="label_15">
+       <property name="text">
+        <string>A</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="0" colspan="5">
+      <widget class="QTimeEdit" name="timeEdit_start">
+       <property name="displayFormat">
+        <string>HH:mm</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="4" colspan="2">
+      <widget class="QLabel" name="label_16">
+       <property name="text">
+        <string>Hasta</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="0" colspan="4">
+      <widget class="QDateEdit" name="dateEdit_start">
+       <property name="displayFormat">
+        <string>yyyy-MM-dd</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="22" column="0" colspan="5">
+      <widget class="QPushButton" name="pushButton_add">
+       <property name="text">
+        <string>Agregar</string>
+       </property>
+      </widget>
+     </item>
+     <item row="22" column="5">
+      <widget class="QPushButton" name="pushButton_new">
+       <property name="text">
+        <string>Nuevo</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_4">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>20</y>
+     <width>301</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Filtrar por</string>
+   </property>
+   <widget class="QLineEdit" name="lineEdit_filtered">
+    <property name="geometry">
+     <rect>
+      <x>137</x>
+      <y>30</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_filtered">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

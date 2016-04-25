@@ -1,0 +1,13 @@
+[Error 0]: Error al leer la base de datos.
+[Error 1] Error al realizar consulta a la base de datos.
+
+
+people state:
+
+RIN : rechazada por inacativa.
+ROD : rechazada por fuera de rango fecha.
+ROT : rechazada por fuera de rango horario.
+RDB : rechazada por no estar en la base de datos.
+RMR : Rechazado por no cumplir con requerimientos de subcontratista.
+RNQ : Rechazado por no cumplir con requerimientos previsionales de subcontratista.
+RNS : Rechazado por no cumplir con requerimientos de segurodad de subcontratista.

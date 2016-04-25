@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/Access-Denied-icon.png</file>
+        <file>images/bad.png</file>
+        <file>images/Database-Accept-icon.png</file>
+        <file>images/Database-Delete-icon.png</file>
+        <file>images/export-excel-icon.png</file>
+        <file>images/log.png</file>
+        <file>images/Mimes-application-vnd.ms-excel-icon.png</file>
+        <file>images/ok.png</file>
+        <file>images/uptdate.png</file>
+        <file>images/user.png</file>
+        <file>images/User-blue-icon.png</file>
+        <file>images/User-green-icon.png</file>
+        <file>images/User-red-icon.png</file>
+        <file>images/Users-User-icon.png</file>
+        <file>images/User-yellow-icon.png</file>
+        <file>sounds/beep.wav</file>
+        <file>images/logo.png</file>
+        <file>images/logo.jpeg</file>
+    </qresource>
+</RCC>
