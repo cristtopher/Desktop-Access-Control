@@ -47,7 +47,7 @@ void Users::on_pushButton_clicked()
         QString rut_company = conn.getFirstFromDb(rutSignin,"select rut from company where name='"+ui->comboBox_company->itemText(ui->comboBox_company->currentIndex())+"'");
         QString id_rol = conn.getFirstFromDb(rutSignin,"select id from rol where name='"+ui->comboBox_id_rol->itemText(ui->comboBox_id_rol->currentIndex())+"'");
 
-        QString query="insert into user (rut, names, paternal_surname, password, rut_company, id_rol, maternal_surname) values ('"+ui->lineEdit_rut->text()+"',')"+
+        QString query="insert into users (rut, names, paternal_surname, password, rut_company, id_rol, maternal_surname) values ('"+ui->lineEdit_rut->text()+"',')"+
                 ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"+ui->lineEdit_password->text()+"','"+rut_company+"',"+id_rol+",'"+ui->lineEdit_maternal_surname->text()+"')";
         if(conn.insert2Db(rutSignin,query)){
             QMessageBox::information(this,tr("INFO"),tr("Usuario agregado exitosamente."));
@@ -72,7 +72,7 @@ void Users::loadTable(){
     connection conn;
     QSqlQueryModel * TableModal=new QSqlQueryModel();
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("select u.rut as Rut,u.names as Nombres,u.paternal_surname as 'Apellido Paterno',u.maternal_surname as 'Apellido Materno',c.name as Empresa,r.name as Rol from user as u left join company as c on u.rut_company=c.rut inner join rol as r on u.id_rol=r.id");
+    qry->prepare("select u.rut as Rut,u.names as Nombres,u.paternal_surname as 'Apellido Paterno',u.maternal_surname as 'Apellido Materno',c.name as Empresa,r.name as Rol from users as u left join company as c on u.rut_company=c.rut inner join rol as r on u.id_rol=r.id");
     qry->exec();
     TableModal->setQuery(*qry);
     ui->tableView->setModel(TableModal);

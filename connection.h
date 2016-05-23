@@ -6,26 +6,27 @@
 #include <QString>
 #include "logger.h"
 #include <QMessageBox>
+#include <qsqldatabase.h>
 
 extern QString rutSignin;
 extern QString error0;
 extern QString error1;
 extern QString rtPort;
 
-#branch
-
 class connection
 {
 
 public:
     QSqlDatabase mydb;
-
-    bool isOpen(){
-        if(mydb.isOpen())
-            return true;
+ bool debug;
+    bool isOpenDB(){
+        if(mydb.open())
+            return debug= true;
         else
-            return false;
+            return debug=false;
+        qDebug() <<"boolean base de datos "+debug;
     }
+
 
     void connClose()
     {
@@ -33,17 +34,29 @@ public:
         {
             mydb.close();
             mydb.removeDatabase(QSqlDatabase::defaultConnection);
+             Logger::insert2Logger(rutSignin," ERROR ", "Base de datos cerrada correctamente");
+
         }
         else
             Logger::insert2Logger(rutSignin," ERROR ", "Tratando de cerrar DB ya cerrada...");
     }
 
     bool connOpen()
-    {
-        mydb=QSqlDatabase::addDatabase("QSQLITE");
-//        mydb.setDatabaseName(QDir::currentPath()+"/db/AccessControl.db");
-        mydb.setDatabaseName("C:/Users/Cris/Repositorio/AccessControl/db/AccessControl.db");
-//        mydb.setDatabaseName("E:/14116/db/AccessControl.db");
+    {   
+        mydb=QSqlDatabase::addDatabase("QPSQL");
+        mydb.setPort(5432);
+        mydb.setDatabaseName("postgres");
+        mydb.setUserName("postgres");
+        mydb.setPassword("admin");
+        mydb.setConnectOptions();
+        if(mydb.open()){
+            qDebug() <<"Conexion al Servidor Realizada Exitosamente";
+        }
+        else
+        {
+            qDebug() <<"Error= " << mydb.lastError().text();
+        }
+
 
         if(!mydb.open())
         {

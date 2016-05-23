@@ -17,14 +17,15 @@ People::People(QWidget *parent) :
     this->setWindowTitle("Control de accesos - Administrador de personas");
     ui->pushButton_new->setEnabled(false);
 
-    connection conn;
-    if(!conn.connOpen()){
+       connection conn;
+       /*
+    if(conn.isOpenDB()==true){
         QMessageBox::critical(this,tr("ERROR"),tr("Error al establecer conexion con base de datos"));
         QPixmap db_bad(":images/Database-Delete-icon.png");
         ui->label_status->setPixmap(db_bad);
     }
     else
-    {
+    {*/
         QPixmap db_ok(":images/Database-Accept-icon.png");
         ui->label_status->setPixmap(db_ok);
         ui->lineEdit_rut->setFocus();
@@ -94,7 +95,7 @@ People::People(QWidget *parent) :
 
         loadTable("default");
     }
-}
+//}
 
 People::~People()
 {
@@ -105,7 +106,8 @@ void People::loadTable(QString query){
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
     if(query=="default")
-        qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
+       // qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
+        qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as Apellido_Paterno,p.maternal_surname as Apellido_Materno,c.name as Empresa,(CASE WHEN p.state = 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
     else
         qry->prepare(query);
     if(!qry->exec())
@@ -382,10 +384,10 @@ void People::on_lineEdit_filtered_textChanged(const QString &arg1)
         case 2: //paternal_surname
         case 3: //maternal_surname
         case 4: //state
-            query = "select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id where p."+ui->comboBox_filtered->itemData(indexSelected).toString()+" like '"+arg1+"%'";
+            query = "select p.rut as Rut,p.names as Nombres,p.paternal_surname as Apellido_Paterno,p.maternal_surname as Apellido_Materno,c.name as Empresa,(CASE WHEN p.state = 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id where p."+ui->comboBox_filtered->itemData(indexSelected).toString()+" like '"+arg1+"%'";
             break;
         case 5: //company
-            query = "select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id where c.name like '"+arg1+"%'";
+            query = "select p.rut as Rut,p.names as Nombres,p.paternal_surname as Apellido_Paterno,p.maternal_surname as Apellido_Materno,c.name as Empresa,(CASE WHEN p.state ='A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id where c.name like '"+arg1+"%'";
             break;
         }
     }
@@ -478,14 +480,21 @@ void People::on_pushButton_add_clicked()
                             else
                             {
                                 QString query;
-                                if(ui->comboBox_frequency->itemText(ui->comboBox_frequency->currentIndex())=="PERMANENTE")
-                                    query=tr("insert into people (rut, names, paternal_surname, maternal_surname, birthdate, rut_company, state, code_nationality, ")
+                                if(ui->comboBox_frequency->itemText(ui->comboBox_frequency->currentIndex())=="PERMANENTE"){
+                                   query=tr("insert into people (rut, names, paternal_surname, maternal_surname, birthdate, rut_company, state, code_nationality, ")
                                         + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
                                         +"id_profile, id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"
                                         +ui->lineEdit_maternal_surname->text()+"','"+ui->dateEdit_birthdate->text()+"','"
                                         +rut_company+"','"+state+"','"+id_nationality+"','"+ui->timeEdit_start->text()+"','"+ui->timeEdit_end->text()+"','"+ui->dateEdit_start->text()+"','""','"
                                         +ui->lineEdit_cellphone->text()+"','"+ui->lineEdit_email->text()+"','"+id_position+"','"+id_profile+"','"+id_frequency+"')";
-                                else
+
+                                   /* query=tr("insert into people (rut, names, paternal_surname,birthdate, rut_company, state, code_nationality,")
+                                                                           + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
+                                                                           +"id_profile,picture,maternal_surname,id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"
+                                                                           +ui->dateEdit_birthdate->text()+"','"+rut_company+"','"
+                                                                           +state+"','"+id_nationality+"','"+ui->timeEdit_start->text()+"','"+ui->timeEdit_end->text()+"','"+ui->dateEdit_start->text()+"','"+' '+"','"
+                                                                           +ui->lineEdit_cellphone->+"','"+ui->lineEdit_email->text()+"','"+id_position+"','"+id_profile+"','"+' '+"','"+ui->lineEdit_maternal_surname->text()+"','"+id_frequency+"')";*/
+                                }else                               
                                     query=tr("insert into people (rut, names, paternal_surname, maternal_surname, birthdate, rut_company, state, code_nationality, ")
                                         + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
                                         +"id_profile, id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"

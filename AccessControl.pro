@@ -6,13 +6,14 @@
 
 include(3rdparty\QtXlsxWriter\src\xlsx\qtxlsx.pri)
 
+
 QT      += core gui sql serialport
 QT      += printsupport
 QT      += axcontainer
 QT      += multimedia
-
+QT      += sql
+QT      += core network sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 TARGET = AccessControl
 TEMPLATE = app
 INCLUDEPATH += incluide
@@ -67,3 +68,4 @@ FORMS    += dashboard.ui \
     rejectedreport.ui \
     configuration.ui \
     dailyreport.ui
+

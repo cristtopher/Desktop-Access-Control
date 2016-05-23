@@ -41,7 +41,7 @@ void Login::on_pushButton_open_clicked()
     {
         connection conn;
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->prepare("select rut,password from user where rut='"+
+        qry->prepare("select rut,password from users where rut='"+
                      ui->lineEdit_rut->text()+"' and password='"+
                      ui->lineEdit_password->text()+"'");
         if(qry->exec())
@@ -90,4 +90,6 @@ void Login::on_pushButton_cancel_clicked()
 {
     rutSignin = "";
     this->close();
+
+
 }

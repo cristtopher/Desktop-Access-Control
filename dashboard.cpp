@@ -41,6 +41,7 @@
 #include "__lib__.h"
 
 #include <QProgressDialog>
+#include <QtWidgets/QApplication>
 
 Lib lib;
 
@@ -90,14 +91,13 @@ Dashboard::Dashboard(QWidget *parent) :
     connection conn;
     conn.connOpen();
 
-    if(conn.isOpen())
+    if(conn.isOpenDB())
         ui->label_status_db->setPixmap(okPix);
     else
         ui->label_status_db->setPixmap(badPix);
 
     Login login(this);
     login.exec();
-
     if(rutSignin.isEmpty())
         on_actionSalir_triggered();
 
@@ -118,7 +118,7 @@ Dashboard::Dashboard(QWidget *parent) :
     ui->pushButton_rejected->setIcon(DeniedIcon);
     ui->pushButton_userProfile->setIcon(userProfileIcon);
 
-    ui->label_userName->setText(conn.getFirstFromDb(rutSignin,"select names from user where rut='"+rutSignin+"'"));
+    ui->label_userName->setText(conn.getFirstFromDb(rutSignin,"select names from users where rut='"+rutSignin+"'"));
 
     QTimer *timer=new QTimer(this);
     connect(timer, SIGNAL(timeout()),this,SLOT(showTime()));
@@ -135,7 +135,7 @@ Dashboard::Dashboard(QWidget *parent) :
     ui->actionAdministrarEmpresas->setEnabled(false);
     ui->actionAdministrarCargos->setEnabled(false);
     ui->actionAdministrarPerfiles->setEnabled(false);
-    switch (conn.getFirstFromDb(rutSignin,"select id_rol from user where rut='"+rutSignin+"'").toInt()) {
+    switch (conn.getFirstFromDb(rutSignin,"select id_rol from users where rut='"+rutSignin+"'").toInt()) {
     case 2: //Authorizer
         ui->menuEmpresas->setEnabled(false);
         ui->menuCargos->setEnabled(false);
@@ -186,7 +186,7 @@ Dashboard::Dashboard(QWidget *parent) :
     //RTScan
     RTScan = new QSerialPort(this);
     serialBuffer = "";
-    RTScan->setPortName(conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from user where rut = '"+rutSignin+"')"));
+    RTScan->setPortName(conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from users where rut = '"+rutSignin+"')"));
     if(RTScan->open(QIODevice::ReadOnly))
     {
         RTScan->setBaudRate(QSerialPort::Baud115200);
@@ -409,6 +409,7 @@ void Dashboard::loadTables(QString type)
         QMessageBox::critical(this,tr("Error:"),error1);
         statusBar()->showMessage(error1,5000);
         Logger::insert2Logger(rutSignin," ERROR ", qry->lastError().text()+" "+qry->executedQuery());
+
     }
     else
     {
@@ -559,6 +560,7 @@ void Dashboard::handlePeople(QString device){
     qry->prepare("select p.rut,p.names,p.paternal_surname,p.birthdate,co.name,p.state,na.code,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone,p.email,po.name,pro.name,p.picture,p.maternal_surname,fr.name from people as p left join company as co on p.rut_company=co.rut left join nationality as na on p.code_nationality=na.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as fr on p.id_frequency=fr.id where p.rut='"+global_PERSONAL_DATA+"'");
     if (!qry->exec())
     {
+
         qApp->beep();
         QMessageBox::critical(this,tr("ERROR"),error1);
         Logger::insert2Logger(rutSignin," ERROR ", qry->lastError().text()+" "+qry->executedQuery());
@@ -568,13 +570,17 @@ void Dashboard::handlePeople(QString device){
     {
         qApp->beep();
         ui->lineEdit_rut->setText(global_PERSONAL_DATA);
+
         if(device=="CS")
         {
             ui->lineEdit_name->setText(global_GIVENNAME);
             ui->lineEdit_maternalSurname->setText(global_MATERNAL_SURNAME);
             ui->lineEdit_paternalSurname->setText(global_PATERNAL_SURNAME);
-            if(conn.getFirstFromDb(rutSignin, "select take_picture from configuration where key=(select key from user where rut = '"+rutSignin+"')") == "YES")
+            qDebug() <<"if de select take picture antes de entrar";
+            if(conn.getFirstFromDb(rutSignin, "select take_picture from configuration where key=(select key from users where rut = '"+rutSignin+"')") == "true")
             {
+            qDebug() <<"if de select take picture  despues de entrar y en caso true";
+
                 int ret = QMessageBox::warning(this, tr("Advertencia"),
                                                tr("Persona sin foto, si desea obtener gire cedula al anverso y presione ok."),
                                                QMessageBox::Ok | QMessageBox::Cancel);
@@ -606,8 +612,8 @@ void Dashboard::handlePeople(QString device){
         }
         else if(device=="RT")
         {
-            QMessageBox::critical(this,tr("PRECAUCION"),tr("INGRESO RECHAZADO, persona no se encuentra en la base de datos."));
-            conn.insert2Db(rutSignin,"insert into people (rut,names,paternal_surname,maternal_surname,birthdate,state,code_nationality,picture) values ('"+global_PERSONAL_DATA+"','"+global_GIVENNAME+"','"+global_PATERNAL_SURNAME+"','"+global_MATERNAL_SURNAME+"','"+global_BIRTH_DATE+"','I','"+global_CODE_NATIONALITY+"','"+imgPath+"')");
+            QMessageBox::critical(this,tr("PRECAUCION"),tr("INGRESO RECHAZADO, Persona no se encuentra en la base de datos.Ingreselo con Dipositivo Enrolador"));
+ //           conn.insert2Db(rutSignin,"insert into people (rut,names,paternal_surname,maternal_surname,birthdate,state,code_nationality,picture) values ('"+global_PERSONAL_DATA+"','"+global_GIVENNAME+"','"+global_PATERNAL_SURNAME+"','"+global_MATERNAL_SURNAME+"','"+global_BIRTH_DATE+"','I','"+global_CODE_NATIONALITY+"','"+imgPath+"')");
             conn.insert2Db(rutSignin,"insert into record (datetime_input,rut_people,rut_user,type,state,comment) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','RDB','"+comment+"')");
         }
         clean("",true);
@@ -652,7 +658,7 @@ void Dashboard::handlePeople(QString device){
             global_PICTURE=":/images/User-blue-icon.png";
             if(device=="CS")
             {
-                if(conn.getFirstFromDb(rutSignin, "select take_picture from configuration where key=(select key from user where rut = '"+rutSignin+"')") == "YES")
+                if(conn.getFirstFromDb(rutSignin, "select take_picture from configuration where key=(select key from users where rut = '"+rutSignin+"')") == "YES")
                 {
                     int ret = QMessageBox::warning(this, tr("Advertencia"),
                                                    tr("Persona sin foto, si desea obtener, gire cedula al anverso y presione ok."),
@@ -697,7 +703,7 @@ void Dashboard::handlePeople(QString device){
         //Autorizher
         QStringList authorizer;
         QSqlQuery* qury=new QSqlQuery(conn.mydb);
-        qury->prepare("select names from user where id_rol=2");
+        qury->prepare("select names from users where id_rol=2");
         if(!qury->exec())
         {
             QMessageBox::critical(this,tr("ERROR"),error1);
@@ -955,6 +961,7 @@ void Dashboard::handlePeople(QString device){
             int input=0;
             if(!qry->exec())
             {
+                qDebug()<<"if de ejecutar sentencia";
                 QMessageBox::critical(this,tr("Error:"),error1);
                 statusBar()->showMessage(error1,5000);
                 Logger::insert2Logger(rutSignin," ERROR ", qry->lastError().text()+" "+qry->executedQuery());
@@ -1339,7 +1346,7 @@ void Dashboard::loadLCD(){
             closed++;
     }
 
-    qry->prepare("select id from record where state == 'O' and patent_input != '' and datetime_input like '"+QDate::currentDate().toString("yyyy-MM-dd")+"%'");
+    qry->prepare("select id from record where state ='O' and patent_input != '' and datetime_input like '"+QDate::currentDate().toString("yyyy-MM-dd")+"%'");
     if(!qry->exec())
     {
         QMessageBox::critical(this,tr("Error:"), qry->lastError().text()+" "+qry->executedQuery());
@@ -1403,8 +1410,9 @@ void Dashboard::exit(){
 
 void Dashboard::on_actionSalir_triggered()
 {
-    delete ui;
-    Dashboard::exit();
+   // delete ui;
+   // Dashboard::exit();
+   QApplication::quit();
 }
 
 void Dashboard::on_actionExportar_triggered()
@@ -1527,11 +1535,12 @@ Dashboard::~Dashboard()
 
 void Dashboard::on_actionCerrar_Sesi_n_triggered()
 {
-    this->close();
+    //this->close();
     Logger::insert2Logger(rutSignin," INFO ","Sesion closed.");
-    rutSignin.clear();
-    Login login(this);
-    login.exec();
+    connection temp;
+    temp.connClose();
+    qApp->quit();
+    QProcess::startDetached(qApp->arguments()[0],qApp->arguments());
 }
 
 void Dashboard::showTime()
@@ -1943,7 +1952,7 @@ void Dashboard::on_pushButton_userProfile_clicked()
     UserProfile userprofile(this);
     userprofile.exec();
     connection conn;
-    ui->label_userName->setText(conn.getFirstFromDb(rutSignin,"select names from user where rut='"+rutSignin+"'"));
+    ui->label_userName->setText(conn.getFirstFromDb(rutSignin,"select names from users where rut='"+rutSignin+"'"));
 }
 
 void Dashboard::on_actionIndividual_triggered()
@@ -2012,7 +2021,7 @@ void Dashboard::serialReceived(){
 //    }
 
 //    ui->lineEdit_pdf417->setText(global_PERSONAL_DATA);
-    global_PERSONAL_DATA = conn.getFirstFromDb(rutSignin,"select rut from people where rut like '"+rut+"_'");
+    global_PERSONAL_DATA = conn.getFirstFromDb(rutSignin,"select rut from people where rut like '"+rut+"%'");
     if(global_PERSONAL_DATA.isEmpty())
         ui->lineEdit_pdf417->setText(rut);
     else
@@ -2037,7 +2046,7 @@ void Dashboard::on_actionDetectar_RTScan_triggered()
 //        foreach (const QSerialPortInfo &Ports, QSerialPortInfo::availablePorts())
 //            ui->comboBox_rtscan->addItem(Ports.portName());
 
-        if(RTScan->portName() == conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from user where rut = '"+rutSignin+"')"))
+        if(RTScan->portName() == conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from users where rut = '"+rutSignin+"')"))
         {
             /*comparar con portname que aparece en el foreach*/
             QPixmap okPix(":/images/ok.png");

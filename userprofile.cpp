@@ -13,7 +13,7 @@ UserProfile::UserProfile(QWidget *parent) :
 
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("select * from user where rut='"+rutSignin+"'");
+    qry->prepare("select * from users where rut='"+rutSignin+"'");
     qry->exec();
     while(qry->next()){
         ui->lineEdit_rut->setText(rutSignin);
@@ -33,7 +33,7 @@ void UserProfile::on_pushButton_clicked()
 {
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("UPDATE user SET names = '"+ui->lineEdit_names->text()+
+    qry->prepare("UPDATE users SET names = '"+ui->lineEdit_names->text()+
                  "', paternal_surname = '"+ui->lineEdit_paternal_surname->text()+"', maternal_surname = '"+ui->lineEdit_maternal_surname->text()+
                  "', password = '"+ui->lineEdit_password->text()+"' where rut='"+rutSignin+"'");
     if(!qry->exec())

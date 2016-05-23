@@ -22,7 +22,7 @@ ReadWithoutCI::ReadWithoutCI(QWidget *parent) :
     ui->lineEdit_rut->setFocus();
     ui->label_user->setPixmap(user);
     connection conn;
-    if(conn.isOpen())
+    if(conn.isOpenDB())
         ui->label_status->setPixmap(db_bad);
     else
         ui->label_status->setPixmap(db_ok);
@@ -53,10 +53,13 @@ void ReadWithoutCI::on_pushButton_search_clicked()
         }
         else
         {
-            int count=0;
-            while(qry->next())
-            {
-                count++;
+            bool ishere=false;
+            if(qry->next()){
+
+                if(!qry->value(0).toString().isEmpty())
+                    ishere=true;
+                else
+                    ishere=false;
                 ui->lineEdit_names->setText(qry->value(0).toString());
                 ui->lineEdit_paternal_surname->setText(qry->value(1).toString());
                 ui->lineEdit_maternal_surname->setText(qry->value(2).toString());
@@ -96,13 +99,15 @@ void ReadWithoutCI::on_pushButton_search_clicked()
                         hasInput = false;
                     }
                 }
-            }
-            if(count<1)
+        }
+
+          if(ishere==false)
             {
                 qApp->beep();
                 QMessageBox::warning(this, tr("Alerta"), tr("Rut no encontrado"));
                 clean();
             }
+          else{}
         }
         delete qry;
     }
@@ -136,7 +141,7 @@ QString ReadWithoutCI::verifyPeople()
         //Autorizher
         QStringList authorizer;
         QSqlQuery* qury=new QSqlQuery(conn.mydb);
-        qury->prepare("select names from user where id_rol=2");
+        qury->prepare("select names from users where id_rol=2");
         if(!qury->exec())
         {
             QMessageBox::critical(this,tr("ERROR"),error1);
@@ -389,7 +394,6 @@ void ReadWithoutCI::on_pushButton_register_clicked()
         connection conn;
         QDateTime currentDateTime = QDateTime::currentDateTime();
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-
         int inputCurrentIndex = ui->listView_imput->currentIndex().row();
         if(hasInput)
         {
@@ -397,7 +401,9 @@ void ReadWithoutCI::on_pushButton_register_clicked()
             {
                 QMessageBox::warning(this,tr("Advertencia"),tr("Este usuario contiene registros de entrada sin salida, favor registrar salida manual antes de continuar."));
                 ui->listView_imput->setFocus();
+
                 Logger::insert2Logger(rutSignin," ERROR ", "Se ha intentado registrar entrada del usuario " +ui->lineEdit_rut->text()+" que contiene ingresos previos.");
+
             }
             else{
                 if(ui->lineEdit_comment->text().isEmpty())
@@ -408,12 +414,15 @@ void ReadWithoutCI::on_pushButton_register_clicked()
                     qry->prepare("update record set state='C',datetime_output='"+currentDateTime.toString("yyyy-MM-dd HH:mm")+"',patent_output='"+
                             ui->lineEdit_patent_output->text()+"',comment=comment ||', "+ui->lineEdit_comment->text()+"' where datetime_input='"+
                             ui->listView_imput->currentIndex().data().toString()+"' and rut_people='"+ui->lineEdit_rut->text()+"'");
-            }
         }
-        else
-            qry->prepare(verifyPeople());
+          }  else
+           qry->prepare(verifyPeople());
+       // QSqlQueryModel *modal=new QSqlQueryModel();
+       // ui->listView_imput->setCurrentIndex(modal->index(0,0));
+
         if(qry->exec())
         {
+
             Logger::insert2Logger(rutSignin, " DEBUG ", ui->lineEdit_rut->text() + " -> " + qry->lastQuery());
             QMessageBox::information(this,tr("ENHORABUENA"),tr("Persona registrado exitosamente."));
             clean();
