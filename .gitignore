@@ -2,3 +2,4 @@ db/
 people/
 *.log
 *.autosave
+*.pro.user
