@@ -12,6 +12,8 @@ extern QString error0;
 extern QString error1;
 extern QString rtPort;
 
+#branch
+
 class connection
 {
 
