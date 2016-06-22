@@ -39,8 +39,8 @@ public:
     bool connOpen()
     {
         mydb=QSqlDatabase::addDatabase("QSQLITE");
-//        mydb.setDatabaseName(QDir::currentPath()+"/db/AccessControl.db");
-        mydb.setDatabaseName("C:/Users/Cris/Repositorio/AccessControl/db/AccessControl.db");
+        mydb.setDatabaseName(QDir::currentPath()+"/db/AccessControl.db");
+//        mydb.setDatabaseName("C:/Users/jmora/Desktop/db/AccessControl.db");
 //        mydb.setDatabaseName("E:/14116/db/AccessControl.db");
 
         if(!mydb.open())

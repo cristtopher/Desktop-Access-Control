@@ -83,9 +83,8 @@ Dashboard::Dashboard(QWidget *parent) :
     QPixmap okPix(":/images/ok.png");
     QPixmap badPix(":/images/bad.png");
     QPixmap userBlueIcon(":/images/User-blue-icon.png");
-    QPixmap LogoPix(":/images/logo.png");
+    QPixmap LogoPix(":/images/axxezo.png");
     QPixmap userProfilePix(":/images/user.png");
-    ui->label_logo->setPixmap(LogoPix);
 
     connection conn;
     conn.connOpen();
