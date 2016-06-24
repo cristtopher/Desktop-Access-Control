@@ -42,7 +42,18 @@ public:
     }
 
     bool connOpen()
-    {   
+    {
+        QFile file("./conexion.conf");
+        if(file.open(QFile::ReadOnly|QFile::Truncate)){
+            QTextStream in(&file);
+            QString text = in.readAll();
+            file.close();
+            qDebug() <<text;
+
+        }
+        else
+        {
+        }
         mydb=QSqlDatabase::addDatabase("QPSQL");
         mydb.setPort(5432);
         mydb.setDatabaseName("postgres");

@@ -84,9 +84,8 @@ Dashboard::Dashboard(QWidget *parent) :
     QPixmap okPix(":/images/ok.png");
     QPixmap badPix(":/images/bad.png");
     QPixmap userBlueIcon(":/images/User-blue-icon.png");
-    QPixmap LogoPix(":/images/logo.png");
+    QPixmap LogoPix(":/images/axxezo.png");
     QPixmap userProfilePix(":/images/user.png");
-    ui->label_logo->setPixmap(LogoPix);
 
     connection conn;
     conn.connOpen();
@@ -397,9 +396,9 @@ void Dashboard::loadTables(QString type)
     if(type == "default_input")
            query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.patent_input,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position  where r.state='O' and r.datetime_input like '"+currentDate+"%'";
        else if(type == "default_output")
-           query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,pos.name,r.patent_input,r.patent_output,r.datetime_output,r.comment,p.picture from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state='C' and r.datetime_output like '"+currentDate+"%' order by datetime_output";
+           query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.patent_input,r.patent_output,r.datetime_output,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state='C' and r.datetime_output like '"+currentDate+"%' order by datetime_output";
        else if(type == "default_rejected")
-           query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,pos.name,r.state,r.patent_input,r.comment,p.picture from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state like 'R%' and r.datetime_input like '"+currentDate+"%'";
+           query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.state,r.patent_input,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state like 'R%' and r.datetime_input like '"+currentDate+"%'";
        else
            query = type; // for no default querys.
 
@@ -424,8 +423,13 @@ void Dashboard::loadTables(QString type)
             ui->lineEdit_maternalSurname->setText(qry->value(5).toString());
             ui->lineEdit_company->setText(qry->value(6).toString());
             ui->lineEdit_profile->setText(qry->value(7).toString());
-            ui->lineEdit_position->setText(qry->value(8).toString());
-
+            if(ui->tabWidget->currentIndex()==0){
+            ui->lineEdit_position->setText(qry->value(11).toString());
+            }else if(ui->tabWidget->currentIndex()==1){
+                ui->lineEdit_position->setText(qry->value(13).toString());
+            }else if(ui->tabWidget->currentIndex()==2){
+                ui->lineEdit_position->setText(qry->value(12).toString());
+            }
             if(ui->tabWidget->currentIndex()==0) // Tab for input
             {                
                 row = ui->tableWidget_input->rowCount();
@@ -436,8 +440,8 @@ void Dashboard::loadTables(QString type)
                     ui->tableWidget_input->setItem(row, column, new QTableWidgetItem(qry->value(column).toString()));
 
                 //Picture
-                if(!qry->value(11).toString().isEmpty())
-                    user.load(qry->value(11).toString());
+                if(!qry->value(10).toString().isEmpty())
+                    user.load(qry->value(10).toString());
                 else
                     user.load(":/images/User-blue-icon.png");
             }
@@ -452,8 +456,8 @@ void Dashboard::loadTables(QString type)
                 }
 
                 //Picture
-                if(!qry->value(13).toString().isEmpty())//valor anterior 11
-                    user.load(qry->value(13).toString());//valor anterior 11
+                if(!qry->value(12).toString().isEmpty())//valor anterior 11
+                    user.load(qry->value(12).toString());//valor anterior 11
                 else
                     user.load(":/images/User-blue-icon.png");
             }
@@ -485,8 +489,8 @@ void Dashboard::loadTables(QString type)
                 }
 
                 //Picture
-                if(!qry->value(12).toString().isEmpty())
-                    user.load(qry->value(12).toString());
+                if(!qry->value(11).toString().isEmpty())
+                    user.load(qry->value(11).toString());
                 else
                     user.load(":/images/User-blue-icon.png");
             }

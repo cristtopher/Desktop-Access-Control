@@ -18,5 +18,6 @@
         <file>sounds/beep.wav</file>
         <file>images/logo.png</file>
         <file>images/logo.jpeg</file>
+        <file>images/axxezo.png</file>
     </qresource>
 </RCC>
