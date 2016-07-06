@@ -44,22 +44,34 @@ public:
     bool connOpen()
     {
         QFile file("./conexion.conf");
+        QString ip;
         if(file.open(QFile::ReadOnly|QFile::Truncate)){
             QTextStream in(&file);
-            QString text = in.readAll();
+            ip = in.readAll();
             file.close();
-            qDebug() <<text;
+            qDebug() <<"setear puerto "+ip;
 
         }
         else
         {
         }
+
         mydb=QSqlDatabase::addDatabase("QPSQL");
         mydb.setPort(5432);
-        mydb.setDatabaseName("postgres");
-        mydb.setUserName("postgres");
-        mydb.setPassword("admin");
+        mydb.setHostName(ip+"");
+        mydb.setDatabaseName("oxxean");
+        mydb.setUserName("axxezo");
+        mydb.setPassword("4xX3z0!");
         mydb.setConnectOptions();
+
+//        mydb=QSqlDatabase::addDatabase("QPSQL");
+//        mydb.setPort(5432);
+//        mydb.setHostName(ip+"");
+//        mydb.setDatabaseName("postgres");
+//        mydb.setUserName("postgres");
+//        mydb.setPassword("admin");
+//        mydb.setConnectOptions();
+
         if(mydb.open()){
             qDebug() <<"Conexion al Servidor Realizada Exitosamente";
         }
