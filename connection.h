@@ -18,7 +18,7 @@ class connection
 
 public:
     QSqlDatabase mydb;
- bool debug;
+    bool debug;
     bool isOpenDB(){
         if(mydb.open())
             return debug= true;
@@ -34,7 +34,7 @@ public:
         {
             mydb.close();
             mydb.removeDatabase(QSqlDatabase::defaultConnection);
-             Logger::insert2Logger(rutSignin," ERROR ", "Base de datos cerrada correctamente");
+            Logger::insert2Logger(rutSignin," ERROR ", "Base de datos cerrada correctamente");
 
         }
         else
@@ -56,21 +56,21 @@ public:
         {
         }
 
-        mydb=QSqlDatabase::addDatabase("QPSQL");
+        /* mydb=QSqlDatabase::addDatabase("QPSQL");
         mydb.setPort(5432);
         mydb.setHostName(ip+"");
         mydb.setDatabaseName("oxxean");
         mydb.setUserName("axxezo");
         mydb.setPassword("4xX3z0!");
-        mydb.setConnectOptions();
+        mydb.setConnectOptions();*/
 
-//        mydb=QSqlDatabase::addDatabase("QPSQL");
-//        mydb.setPort(5432);
-//        mydb.setHostName(ip+"");
-//        mydb.setDatabaseName("postgres");
-//        mydb.setUserName("postgres");
-//        mydb.setPassword("admin");
-//        mydb.setConnectOptions();
+        mydb=QSqlDatabase::addDatabase("QPSQL");
+        mydb.setPort(5432);
+        mydb.setHostName(ip+"");
+        mydb.setDatabaseName("postgres");
+        mydb.setUserName("postgres");
+        mydb.setPassword("admin");
+        mydb.setConnectOptions();
 
         if(mydb.open()){
             qDebug() <<"Conexion al Servidor Realizada Exitosamente";
@@ -107,7 +107,7 @@ public:
             }
         }
         else
-           return false;
+            return false;
     }
 
     static QString getFirstFromDb(const QString rut_user, const QString query)
@@ -125,7 +125,7 @@ public:
             }
             else
             {
-//                Logger::insert2Logger(rut_user," EMPTY ", qry->executedQuery());
+                //                Logger::insert2Logger(rut_user," EMPTY ", qry->executedQuery());
                 return "";
             }
         }
