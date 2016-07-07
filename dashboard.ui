@@ -650,6 +650,9 @@
      <property name="maxLength">
       <number>9</number>
      </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
     </widget>
    </widget>
    <widget class="QLabel" name="label_userName">

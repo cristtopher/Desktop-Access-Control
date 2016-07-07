@@ -394,11 +394,11 @@ void Dashboard::loadTables(QString type)
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
 
     if(type == "default_input")
-        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.patent_input,r.comment,p.picture from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id where r.state='O' and r.datetime_input like '"+currentDate+"%'";
+        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.patent_input,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state='O' and r.datetime_input like '"+currentDate+"%'";
     else if(type == "default_output")
-        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.patent_input,r.patent_output,r.datetime_output,r.comment,p.picture from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id where r.state='C' and r.datetime_output like '"+currentDate+"%' order by datetime_output";
+        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.patent_input,r.patent_output,r.datetime_output,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state='C' and r.datetime_output like '"+currentDate+"%' order by datetime_output";
     else if(type == "default_rejected")
-        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.state,r.patent_input,r.comment,p.picture from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id where r.state like 'R%' and r.datetime_input like '"+currentDate+"%'";
+        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.state,r.patent_input,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state like 'R%' and r.datetime_input like '"+currentDate+"%'";
     else
         query = type; // for no default querys.
 
@@ -422,6 +422,13 @@ void Dashboard::loadTables(QString type)
             ui->lineEdit_maternalSurname->setText(qry->value(5).toString());
             ui->lineEdit_company->setText(qry->value(6).toString());
             ui->lineEdit_profile->setText(qry->value(7).toString());
+            if(ui->tabWidget->currentIndex()==0){
+                            ui->lineEdit_position->setText(qry->value(11).toString());
+                        }else if(ui->tabWidget->currentIndex()==1){
+                            ui->lineEdit_position->setText(qry->value(13).toString());
+                        }else if(ui->tabWidget->currentIndex()==2){
+                            ui->lineEdit_position->setText(qry->value(12).toString());
+                        }
 
             if(ui->tabWidget->currentIndex()==0) // Tab for input
             {                
@@ -429,7 +436,7 @@ void Dashboard::loadTables(QString type)
                 // Inserts an empty row into the table at row.
                 ui->tableWidget_input->insertRow(row);
 
-                for(int column=0;column<=9;++column)
+                for(int column=0;column<=10;++column)
                     ui->tableWidget_input->setItem(row, column, new QTableWidgetItem(qry->value(column).toString()));
 
                 //Picture
@@ -444,7 +451,7 @@ void Dashboard::loadTables(QString type)
                 // Inserts an empty row into the table at row.
                 ui->tableWidget_output->insertRow(row);
 
-                for(int column=0;column<=11;++column){
+                for(int column=0;column<=12;++column){
                     ui->tableWidget_output->setItem(row, column, new QTableWidgetItem(qry->value(column).toString()));
                 }
 
@@ -460,7 +467,7 @@ void Dashboard::loadTables(QString type)
                 // Inserts an empty row into the table at row.
                 ui->tableWidget_rejected->insertRow(row);
 
-                for(int column=0;column<=10;++column){
+                for(int column=0;column<=11;++column){
                     if(column!=8)
                         ui->tableWidget_rejected->setItem(row, column, new QTableWidgetItem(qry->value(column).toString()));
                     else{
