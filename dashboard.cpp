@@ -45,8 +45,8 @@
 Lib lib;
 
 #ifdef GX_NAMESPACES
-    using namespace gx; //jdk
-    using namespace pr; //API
+using namespace gx; //jdk
+using namespace pr; //API
 #endif
 using namespace std;
 
@@ -249,9 +249,9 @@ void Dashboard::loopComboScan(){
                     /* Turning the display leds depending on the status */
                     int color = PR_SLC_OFF;
                     switch(state) {
-                        case PR_TD_OUT:     color = PR_SLC_GREEN; break;
-                        case PR_TD_MOVE:    color = PR_SLC_ANY; break;
-                        case PR_TD_NOMOVE:  color = PR_SLC_RED; break;
+                    case PR_TD_OUT:     color = PR_SLC_GREEN; break;
+                    case PR_TD_MOVE:    color = PR_SLC_ANY; break;
+                    case PR_TD_NOMOVE:  color = PR_SLC_RED; break;
                     }
                     pr.SetStatusLed(0xFF, color);
                 }
@@ -312,9 +312,9 @@ bool Dashboard::comboScanIsOpen(){
         wcout << L"GX devices in the system:\n";
         for(size_t i = 0; i < devices.size(); i++) {
             wcout << i+1 << L". Name: " << devices[i].GetName() << \
-                    L", Type: " << devices[i].GetType() << \
-                    L", Serial: " << devices[i].GetSerial() << \
-                    L", Prio: " << devices[i].GetPriority() << endl;
+                     L", Type: " << devices[i].GetType() << \
+                     L", Serial: " << devices[i].GetSerial() << \
+                     L", Prio: " << devices[i].GetPriority() << endl;
             qDebug()<<devices[i].GetSerial();
         }
         wcout << L"Found " << devices.size() << L" devices." << endl;
@@ -423,15 +423,15 @@ void Dashboard::loadTables(QString type)
             ui->lineEdit_company->setText(qry->value(6).toString());
             ui->lineEdit_profile->setText(qry->value(7).toString());
             if(ui->tabWidget->currentIndex()==0){
-                            ui->lineEdit_position->setText(qry->value(11).toString());
-                        }else if(ui->tabWidget->currentIndex()==1){
-                            ui->lineEdit_position->setText(qry->value(13).toString());
-                        }else if(ui->tabWidget->currentIndex()==2){
-                            ui->lineEdit_position->setText(qry->value(12).toString());
-                        }
+                ui->lineEdit_position->setText(qry->value(11).toString());
+            }else if(ui->tabWidget->currentIndex()==1){
+                ui->lineEdit_position->setText(qry->value(13).toString());
+            }else if(ui->tabWidget->currentIndex()==2){
+                ui->lineEdit_position->setText(qry->value(12).toString());
+            }
 
             if(ui->tabWidget->currentIndex()==0) // Tab for input
-            {                
+            {
                 row = ui->tableWidget_input->rowCount();
                 // Inserts an empty row into the table at row.
                 ui->tableWidget_input->insertRow(row);
@@ -550,9 +550,9 @@ void Dashboard::on_lineEdit_filtered_textChanged(const QString &arg1)
 }
 
 void Dashboard::handlePeople(QString device){
-//    Devices:
-//    CS = ComboScan
-//    RT = RTScan
+    //    Devices:
+    //    CS = ComboScan
+    //    RT = RTScan
 
     QString imgPath;
     QString comment;
@@ -982,7 +982,7 @@ void Dashboard::handlePeople(QString device){
             else if(input == 1) //when have 1 input in state 'O' for any time. TIP: here also be defined 1 input for today.
             {
                 QString dateTimeOutput = connection::getFirstFromDb(rutSignin,
-                                                                   "select datetime_input from record where state='O' and rut_people='"+
+                                                                    "select datetime_input from record where state='O' and rut_people='"+
                                                                     global_PERSONAL_DATA+"'");
                 if(dateTimeOutput == (currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")))
                 {
@@ -1002,8 +1002,8 @@ void Dashboard::handlePeople(QString device){
                 else
                 {
                     QString id = conn.getFirstFromDb(rutSignin,
-                                                        "select id from record where state='O' and rut_people='"+
-                                                         global_PERSONAL_DATA+"'");
+                                                     "select id from record where state='O' and rut_people='"+
+                                                     global_PERSONAL_DATA+"'");
                     query="update record set state='"+recordState+"' ,datetime_output='"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+
                             "' where id='"+id+"'";
                 }
@@ -1111,7 +1111,7 @@ void Dashboard::readFromPR()
                             if(Foreign==true){
                                 QStringList name = QString::fromStdString(doc->FieldA(PR_DF_NAME)).split(" ");
                                 global_PATERNAL_SURNAME = name.at(0);
-//                                global_MATERNAL_SURNAME = name.at(1);
+                                //                                global_MATERNAL_SURNAME = name.at(1);
                                 global_GIVENNAME = name.at(1);
                             }
                             else
@@ -1290,7 +1290,7 @@ void Dashboard::on_pushButton_rejected_clicked()
         QString comment;
         QMessageBox::StandardButton confirm;
         confirm = QMessageBox::question(this,tr("Confirmar"),
-                                                tr("¿Está seguro que desea rechazar a: ")+ui->lineEdit_name->text()+
+                                        tr("¿Está seguro que desea rechazar a: ")+ui->lineEdit_name->text()+
                                         " "+ui->lineEdit_paternalSurname->text()+" ?",QMessageBox::Yes|QMessageBox::No);
         if(confirm == QMessageBox::Yes){
             bool ok;
@@ -1484,18 +1484,18 @@ void Dashboard::on_tabWidget_currentChanged(int index)
     QString query;
     switch(index)
     {
-        case 0:
-            query = "default_input";
-            ui->pushButton_rejected->setEnabled(true);
-            break ;
-        case 1 :
-            query = "default_output";
-            ui->pushButton_rejected->setEnabled(false);
-            break ;
-        case 2 :
-            query = "default_rejected";
-            ui->pushButton_rejected->setEnabled(false);
-            break ;
+    case 0:
+        query = "default_input";
+        ui->pushButton_rejected->setEnabled(true);
+        break ;
+    case 1 :
+        query = "default_output";
+        ui->pushButton_rejected->setEnabled(false);
+        break ;
+    case 2 :
+        query = "default_rejected";
+        ui->pushButton_rejected->setEnabled(false);
+        break ;
     }
     clean("O",true);
     clean("C",true);
@@ -1700,11 +1700,11 @@ void Dashboard::on_actionImportarPersonas_triggered()
                             break;
                         }
                     }
-//                    else
-//                    {
-//                        QMessageBox::critical(this,tr("ERROR"),tr("Campo apellido materno no puede estar vacío."));
-//                        break;
-//                    }
+                    //                    else
+                    //                    {
+                    //                        QMessageBox::critical(this,tr("ERROR"),tr("Campo apellido materno no puede estar vacío."));
+                    //                        break;
+                    //                    }
                 }
                 else
                 {
@@ -1982,49 +1982,44 @@ void Dashboard::on_actionDiario_triggered()
 }
 
 void Dashboard::serialReceived(){
+    serialBuffer ="";
     serialData = RTScan->readAll();
-    serialBuffer += QString::fromStdString(serialData.toStdString());
-    QStringList bufferSplit = serialBuffer.split(" ");
-    QString rut = bufferSplit[0];
-
-    if(rut.startsWith("https"))
+    QString rut;
+    if(serialData.length()==4){
+        connection conn;
+        QString qr=QString::fromStdString(serialData.toStdString());
+        qDebug()<<"codigo qr: "+qr;
+        rut = conn.getFirstFromDb(rutSignin,"select rut from people where qrcode='"+qr+"'");
+        qDebug()<<"select rut from people where qrcode='"+qr+"'";
+    }
+    else if(serialData.length()>4){
+        serialBuffer += QString::fromStdString(serialData.toStdString());
+        QStringList bufferSplit = serialBuffer.split(" ");
+        rut= bufferSplit[0].toUtf8();
+        serialData="";
+        bufferSplit.clear();
+        serialBuffer="";
+        qDebug()<<": "+rut;
+    }
+    else if(rut.startsWith("https"))
     {
         //52 hasta 60 contiene el rut.
         rut = rut.mid(52,8); // 8 digitos a partir del 52.
         if(rut.endsWith("-"))
             rut.remove("-");
     }
-    else
+    else if(rut.at(0).isDigit()&&rut.length()>4){
         rut.resize(8);
-
-    connection conn;
-//    QSqlQuery* qry=new QSqlQuery(conn.mydb);
-//    qry->prepare("select rut,names,paternal_surname,maternal_surname from people where rut like '"+rut+"_'");
-//    qDebug()<<"select rut,names,paternal_surname,maternal_surname from people where rut like '"+rut+"_'";
-//    if(!qry->exec())
-//    {
-//        QMessageBox::critical(this,tr("Error:"),error1);
-//        statusBar()->showMessage(error1,5000);
-//        Logger::insert2Logger(rutSignin," ERROR ", qry->lastError().text()+" "+qry->executedQuery());
-//    }
-//    else
-//    {
-//        global_PERSONAL_DATA = qry->value(0).toString();
-//        global_GIVENNAME=qry->value(1).toString();
-//        global_MATERNAL_SURNAME=qry->value(3).toString();
-//        global_PATERNAL_SURNAME=qry->value(2).toString();
-
-//        qDebug()<<"rut: "<<qry->value(0).toString();
-//    }
-
-//    ui->lineEdit_pdf417->setText(global_PERSONAL_DATA);
-    global_PERSONAL_DATA = conn.getFirstFromDb(rutSignin,"select rut from people where rut like '"+rut+"_'");
-    if(global_PERSONAL_DATA.isEmpty())
-        ui->lineEdit_pdf417->setText(rut);
-    else
-        ui->lineEdit_pdf417->setText(global_PERSONAL_DATA);
-    serialBuffer = "";
-//    delete qry;
+    }
+    qDebug()<<"Rut: " + rut;
+    if(rut.at(0).isDigit()){
+        connection conn;
+        global_PERSONAL_DATA = conn.getFirstFromDb(rutSignin,"select rut from people where rut like '"+rut+"%'");
+        if(global_PERSONAL_DATA.isEmpty())
+            ui->lineEdit_pdf417->setText(rut);
+        else
+            ui->lineEdit_pdf417->setText(global_PERSONAL_DATA);
+    }
 }
 
 void Dashboard::on_lineEdit_pdf417_textChanged(const QString &arg1)
@@ -2040,8 +2035,8 @@ void Dashboard::on_actionDetectar_RTScan_triggered()
 {
     if(RTScan->isOpen()){
         connection conn;
-//        foreach (const QSerialPortInfo &Ports, QSerialPortInfo::availablePorts())
-//            ui->comboBox_rtscan->addItem(Ports.portName());
+        //        foreach (const QSerialPortInfo &Ports, QSerialPortInfo::availablePorts())
+        //            ui->comboBox_rtscan->addItem(Ports.portName());
 
         if(RTScan->portName() == conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from user where rut = '"+rutSignin+"')"))
         {
