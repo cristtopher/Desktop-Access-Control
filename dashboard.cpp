@@ -1992,7 +1992,6 @@ void Dashboard::on_actionDiario_triggered()
 }
 
 void Dashboard::serialReceived(){
-
     serialBuffer = "";
     serialData = "";
     serialData = RTScan->readAll();
@@ -2023,6 +2022,8 @@ void Dashboard::serialReceived(){
         else
             ui->lineEdit_pdf417->setText(global_PERSONAL_DATA);
     }
+
+
 }
 
 void Dashboard::on_lineEdit_pdf417_textChanged(const QString &arg1)
