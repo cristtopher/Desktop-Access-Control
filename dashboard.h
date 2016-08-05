@@ -9,10 +9,21 @@
 #include <QSignalMapper>
 #include <QAxObject>
 #include <iostream>
+#include <connection.h>
+
+extern QString PERSONAL_DATA; //rut.
+extern QString GIVENNAME;
+extern QString MATERNAL_SUR;
+extern QString PATERNAL_SUR;
+extern bool loginWindow;
+extern connection conn;
+
+
 
 namespace Ui {
 class Dashboard;
 }
+
 
 class Dashboard : public QMainWindow
 {
@@ -119,6 +130,9 @@ private slots:
     void on_actionGeneral_triggered();
 
     void on_pushButton_updatePic_clicked();
+
+    void on_actionEnrolar_triggered();
+
 
 private:
     Ui::Dashboard *ui;

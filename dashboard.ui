@@ -384,6 +384,25 @@
      <string>Ctrl+R</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_logo">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>141</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="comboscan.qrc">:/images/axxezo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
@@ -394,7 +413,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_input">
      <attribute name="title">
@@ -758,25 +777,6 @@
      <string>Renovar Fotografía</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_logo_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>151</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="comboscan.qrc">:/images/axxezo.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -786,6 +786,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionRegistro_Manual"/>
+   <addaction name="separator"/>
+   <addaction name="actionEnrolar"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -1026,6 +1028,11 @@
   <action name="actionDetectar_RTScan">
    <property name="text">
     <string>Detectar RTScan</string>
+   </property>
+  </action>
+  <action name="actionEnrolar">
+   <property name="text">
+    <string>Enrolar</string>
    </property>
   </action>
  </widget>

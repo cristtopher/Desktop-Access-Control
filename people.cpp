@@ -8,6 +8,9 @@
 #include <QMessageBox>
 #include <QTableWidgetItem>
 #include <QCompleter>
+#include <dashboard.h>
+
+
 
 People::People(QWidget *parent) :
     QDialog(parent),
@@ -17,8 +20,8 @@ People::People(QWidget *parent) :
     this->setWindowTitle("Control de accesos - Administrador de personas");
     ui->pushButton_new->setEnabled(false);
 
-    connection conn;
-    if(!conn.connOpen()){
+   // connection conn;
+    if(!conn.isOpen()){
         QMessageBox::critical(this,tr("ERROR"),tr("Error al establecer conexion con base de datos"));
         QPixmap db_bad(":images/Database-Delete-icon.png");
         ui->label_status->setPixmap(db_bad);
@@ -102,7 +105,7 @@ People::~People()
 }
 
 void People::loadTable(QString query){
-    connection conn;
+   // connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
     if(query=="default")
         qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
@@ -292,8 +295,7 @@ void People::on_tableView_clicked(const QModelIndex &index)
         QString rut = ui->tableView->model()->data(index).toString();
         connection conn;
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->prepare("select names,paternal_surname,maternal_surname,birthdate,email,cellphone,na.name,co.name,fr.name,pos.name,pro.name,p.state,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour from people as p left join nationality as na on p.code_nationality=na.code left join company as co on p.rut_company=co.rut left join frequency as fr on p.id_frequency=fr.id left join position as pos on p.id_position=pos.id left join profile as pro on p.id_profile=pro.id where p.rut = '"+rut+"'");
-        if(qry->exec()){
+        if(qry->exec("select names,paternal_surname,maternal_surname,birthdate,email,cellphone,na.name,co.name,fr.name,pos.name,pro.name,p.state,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour from people as p left join nationality as na on p.code_nationality=na.code left join company as co on p.rut_company=co.rut left join frequency as fr on p.id_frequency=fr.id left join position as pos on p.id_position=pos.id left join profile as pro on p.id_profile=pro.id where p.rut = '"+rut+"'")){
             qDebug()<<qry->lastQuery();
             while (qry->next()) {
                 ui->lineEdit_rut->setText(rut);
@@ -315,8 +317,9 @@ void People::on_tableView_clicked(const QModelIndex &index)
                     ui->comboBox_nationality->setCurrentIndex(index_nationality);
 
                 int index_company = ui->comboBox_company->findText(qry->value(7).toString());
-                if (index_company != -1) // -1 for not found
+                if (index_company != -1){ // -1 for not found
                     ui->comboBox_company->setCurrentIndex(index_company);
+                }
                 else
                     ui->comboBox_company->setCurrentIndex(-1);
 
@@ -399,7 +402,7 @@ void People::on_tableView_activated(const QModelIndex &index)
 
 void People::on_pushButton_update_clicked()
 {
-    connection conn;
+  //  connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
 
     QString company=conn.getFirstFromDb(rutSignin,"select rut from company where name = '"+ui->comboBox_company->currentText()+"'");
@@ -440,7 +443,7 @@ void People::on_pushButton_update_clicked()
 
 void People::on_pushButton_add_clicked()
 {
-    connection conn;
+    //connection conn;
     if(People::validateChnId(ui->lineEdit_rut->text()))
     {
         if(!ui->lineEdit_names->text().isEmpty())

@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     individualreport.cpp \
     rejectedreport.cpp \
     configuration.cpp \
-    dailyreport.cpp
+    dailyreport.cpp \
+    formcs.cpp
 
 HEADERS  += dashboard.h \
     connection.h \
@@ -51,7 +52,8 @@ HEADERS  += dashboard.h \
     individualreport.h \
     rejectedreport.h \
     configuration.h \
-    dailyreport.h
+    dailyreport.h \
+    formcs.h
 
 FORMS    += dashboard.ui \
     login.ui \
@@ -66,4 +68,5 @@ FORMS    += dashboard.ui \
     individualreport.ui \
     rejectedreport.ui \
     configuration.ui \
-    dailyreport.ui
+    dailyreport.ui \
+    formcs.ui

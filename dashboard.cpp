@@ -27,6 +27,7 @@
 #include "rejectedreport.h"
 #include "configuration.h"
 #include "dailyreport.h"
+#include "formcs.h"
 
 #include <QtCore>
 #include "xlsxdocument.h"
@@ -41,6 +42,9 @@
 #include "__lib__.h"
 
 #include <QProgressDialog>
+#include <QtWidgets/QApplication>
+
+bool loginWindow;
 
 Lib lib;
 
@@ -69,34 +73,44 @@ QString global_START_AUTHORIZED_DATE;
 QString global_END_AUTHORIZED_DATE;
 QString global_PICTURE;
 QString global_DATETIME_INPUT; //used for rejecting access.
+//form
 QString global_FREQUENCY;
+QString PERSONAL_DATA;
+QString GIVENNAME;
+QString MATERNAL_SUR;
+QString PATERNAL_SUR;
+connection conn;
+
 
 PassportReader pr;  /* Object for the PR system */
 QSerialPort *RTScan; /* Object for the RTscan */
+//connection conn;
 
 Dashboard::Dashboard(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Dashboard)
 {
     ui->setupUi(this);
-
     QPixmap okPix(":/images/ok.png");
     QPixmap badPix(":/images/bad.png");
     QPixmap userBlueIcon(":/images/User-blue-icon.png");
     QPixmap LogoPix(":/images/axxezo.png");
     QPixmap userProfilePix(":/images/user.png");
 
-    connection conn;
+
+
     conn.connOpen();
 
-    if(conn.isOpen())
-        ui->label_status_db->setPixmap(okPix);
-    else
-        ui->label_status_db->setPixmap(badPix);
-
+  if(conn.isOpenDB())
+       ui->label_status_db->setPixmap(okPix);
+   else
+       ui->label_status_db->setPixmap(badPix);
     Login login(this);
     login.exec();
-
+    /*if(loginWindow==true){
+        login.close();
+        loginWindow=false;
+    }*/
     if(rutSignin.isEmpty())
         on_actionSalir_triggered();
 
@@ -184,7 +198,6 @@ Dashboard::Dashboard(QWidget *parent) :
 
     //RTScan
     RTScan = new QSerialPort(this);
-    serialBuffer = "";
     RTScan->setPortName(conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from user where rut = '"+rutSignin+"')"));
     if(RTScan->open(QIODevice::ReadOnly))
     {
@@ -366,7 +379,7 @@ void Dashboard::BuildTables()
     ui->tableWidget_output->setColumnWidth(11,200); //Comment
 
     header.clear();
-    header <<"ID" << "Fecha rechazo" << "Rut" << "Nombres" << "Ap. Paterno" << "Ap. Materno" << "Empresa" << "Perfil" << "Motivo" << "Patente Entr." << "Comentario";
+    header <<"ID" << "Fecha rechazo" << "Rut" << "Nombres" << "Ap. Paterno" << "Ap. Materno" << "Empresa" << "Perfil" << "Motivo" << "Patente" << "Comentario";
     ui->tableWidget_rejected->setColumnCount(header.size());
     ui->tableWidget_rejected->setHorizontalHeaderLabels(header);
     ui->tableWidget_rejected->hideColumn(0);
@@ -390,24 +403,25 @@ void Dashboard::loadTables(QString type)
     clean("R",false);
     QString currentDate = QDate::currentDate().toString("yyyy-MM-dd");
     QString query;
-    connection conn;
+    //    connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
 
     if(type == "default_input")
-        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.patent_input,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state='O' and r.datetime_input like '"+currentDate+"%'";
+        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.patent_input,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position  where r.state='O' and r.datetime_input like '"+currentDate+"%' order by datetime_input";
     else if(type == "default_output")
         query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.patent_input,r.patent_output,r.datetime_output,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state='C' and r.datetime_output like '"+currentDate+"%' order by datetime_output";
     else if(type == "default_rejected")
-        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.state,r.patent_input,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state like 'R%' and r.datetime_input like '"+currentDate+"%'";
+        query = "select r.id,r.datetime_input,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,c.name,pro.name,r.state,r.patent_input,r.comment,p.picture,pos.name from record as r left join people as p on r.rut_people=p.rut left join company as c on p.rut_company=c.rut left join profile as pro on p.id_profile=pro.id left join position as pos on pos.id=p.id_position where r.state like 'R%' and r.datetime_input like '"+currentDate+"%' order by datetime_input";
     else
         query = type; // for no default querys.
 
-    qry->prepare(query);
-    if(!qry->exec())
+    //    qry->prepare();
+    if(!qry->exec(query))
     {
         QMessageBox::critical(this,tr("Error:"),error1);
         statusBar()->showMessage(error1,5000);
         Logger::insert2Logger(rutSignin," ERROR ", qry->lastError().text()+" "+qry->executedQuery());
+
     }
     else
     {
@@ -429,7 +443,6 @@ void Dashboard::loadTables(QString type)
             }else if(ui->tabWidget->currentIndex()==2){
                 ui->lineEdit_position->setText(qry->value(12).toString());
             }
-
             if(ui->tabWidget->currentIndex()==0) // Tab for input
             {
                 row = ui->tableWidget_input->rowCount();
@@ -456,8 +469,8 @@ void Dashboard::loadTables(QString type)
                 }
 
                 //Picture
-                if(!qry->value(12).toString().isEmpty())
-                    user.load(qry->value(12).toString());
+                if(!qry->value(12).toString().isEmpty())//valor anterior 11
+                    user.load(qry->value(12).toString());//valor anterior 11
                 else
                     user.load(":/images/User-blue-icon.png");
             }
@@ -562,9 +575,9 @@ void Dashboard::handlePeople(QString device){
 
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("select p.rut,p.names,p.paternal_surname,p.birthdate,co.name,p.state,na.code,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone,p.email,po.name,pro.name,p.picture,p.maternal_surname,fr.name from people as p left join company as co on p.rut_company=co.rut left join nationality as na on p.code_nationality=na.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as fr on p.id_frequency=fr.id where p.rut='"+global_PERSONAL_DATA+"'");
-    if (!qry->exec())
+    if (!qry->exec("select p.rut,p.names,p.paternal_surname,p.birthdate,co.name,p.state,na.code,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone,p.email,po.name,pro.name,p.picture,p.maternal_surname,fr.name from people as p left join company as co on p.rut_company=co.rut left join nationality as na on p.code_nationality=na.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as fr on p.id_frequency=fr.id where p.rut='"+global_PERSONAL_DATA+"'"))
     {
+
         qApp->beep();
         QMessageBox::critical(this,tr("ERROR"),error1);
         Logger::insert2Logger(rutSignin," ERROR ", qry->lastError().text()+" "+qry->executedQuery());
@@ -572,51 +585,22 @@ void Dashboard::handlePeople(QString device){
     }
     else if (!qry->first()) //Person not found in db
     {
-        qApp->beep();
-        ui->lineEdit_rut->setText(global_PERSONAL_DATA);
-        if(device=="CS")
-        {
-            ui->lineEdit_name->setText(global_GIVENNAME);
-            ui->lineEdit_maternalSurname->setText(global_MATERNAL_SURNAME);
-            ui->lineEdit_paternalSurname->setText(global_PATERNAL_SURNAME);
-            if(conn.getFirstFromDb(rutSignin, "select take_picture from configuration where key=(select key from user where rut = '"+rutSignin+"')") == "YES")
-            {
-                int ret = QMessageBox::warning(this, tr("Advertencia"),
-                                               tr("Persona sin foto, si desea obtener gire cedula al anverso y presione ok."),
-                                               QMessageBox::Ok | QMessageBox::Cancel);
-                if(ret==QMessageBox::Ok)
-                {
-                    if(readAnverso(global_PERSONAL_DATA))
-                    {
-                        //imgPath = QDir::currentPath()+"/release/people/"+global_PERSONAL_DATA+".jpg";
-                        imgPath = QDir::currentPath()+"/people/"+global_PERSONAL_DATA+".jpg";
-                        Logger::insert2Logger(rutSignin," DEBUG ","foto guardada en "+imgPath);
-                        QPixmap user(imgPath);
-                        user.load(imgPath);
-                        ui->label_user->setPixmap(user);
-                        conn.insert2Db(rutSignin,"insert into people (rut,names,paternal_surname,maternal_surname,birthdate,state,code_nationality,picture) values ('"+global_PERSONAL_DATA+"','"+global_GIVENNAME+"','"+global_PATERNAL_SURNAME+"','"+global_MATERNAL_SURNAME+"','"+global_BIRTH_DATE+"','I','"+global_CODE_NATIONALITY+"','"+imgPath+"')");
-                    }
-                }
-                else
-                {
-                    conn.insert2Db(rutSignin,"insert into people (rut,names,paternal_surname,maternal_surname,birthdate,state,code_nationality,picture) values ('"+global_PERSONAL_DATA+"','"+global_GIVENNAME+"','"+global_PATERNAL_SURNAME+"','"+global_MATERNAL_SURNAME+"','"+global_BIRTH_DATE+"','I','"+global_CODE_NATIONALITY+"','"+imgPath+"')");
-                }
-                comment = QInputDialog::getText(this, tr("Ingreso Rechazado."),tr("Persona no registrada en la base de datos, INGRESO RECHAZADO.\n\nIngrese comentario:"));
-            }
-            else
-            {
-                comment = QInputDialog::getText(this, tr("Ingreso Rechazado."),tr("Persona no registrada en la base de datos, INGRESO RECHAZADO.\n\nIngrese comentario:"));
-                conn.insert2Db(rutSignin,"insert into people (rut,names,paternal_surname,maternal_surname,birthdate,state,code_nationality) values ('"+global_PERSONAL_DATA+"','"+global_GIVENNAME+"','"+global_PATERNAL_SURNAME+"','"+global_MATERNAL_SURNAME+"','"+global_BIRTH_DATE+"','I','"+global_CODE_NATIONALITY+"')");
-            }
-            conn.insert2Db(rutSignin,"insert into record (datetime_input,rut_people,rut_user,type,state,comment) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','RDB','"+comment+"')");
+        if(device=="CS"){
+            PERSONAL_DATA=global_PERSONAL_DATA; //rut.
+            GIVENNAME=global_GIVENNAME;
+            MATERNAL_SUR=global_MATERNAL_SURNAME;
+            PATERNAL_SUR=global_PATERNAL_SURNAME;
+            pr.CloseDevice();
+            QMessageBox::critical(this,tr("PRECAUCION"),tr("Persona no se encuentra en la base de datos, se abrira el formulario de enrolamiento"));
+            formcs Formcs(this);
+            Formcs.exec();
+        }else if(device=="RT"){
+            pr.CloseDevice();
+            QMessageBox::critical(this,tr("PRECAUCION"),tr("Persona no se encuentra en la base de datos, se abrira el formulario de enrolamiento"));
+            formcs Formcs(this);
+            Formcs.exec();
+
         }
-        else if(device=="RT")
-        {
-            QMessageBox::critical(this,tr("PRECAUCION"),tr("INGRESO RECHAZADO, persona no se encuentra en la base de datos."));
-            conn.insert2Db(rutSignin,"insert into people (rut,names,paternal_surname,maternal_surname,birthdate,state,code_nationality,picture) values ('"+global_PERSONAL_DATA+"','"+global_GIVENNAME+"','"+global_PATERNAL_SURNAME+"','"+global_MATERNAL_SURNAME+"','"+global_BIRTH_DATE+"','I','"+global_CODE_NATIONALITY+"','"+imgPath+"')");
-            conn.insert2Db(rutSignin,"insert into record (datetime_input,rut_people,rut_user,type,state,comment) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','RDB','"+comment+"')");
-        }
-        clean("",true);
     }
     else //Person found on db
     {
@@ -957,9 +941,8 @@ void Dashboard::handlePeople(QString device){
             recordState = "C";
             //For 1 or more than 1 input withaout closed.
             //qry->prepare("select id from record where state='O' and rut_people='" + ui->lineEdit_rut->text()+"' and datetime_input not like'"+currentDate.toString("yyyy-MM-dd")+"%'");
-            qry->prepare("select id from record where state='O' and rut_people='" + ui->lineEdit_rut->text()+"'");
             int input=0;
-            if(!qry->exec())
+            if(!qry->exec("select id from record where state='O' and rut_people='" + ui->lineEdit_rut->text()+"'"))
             {
                 QMessageBox::critical(this,tr("Error:"),error1);
                 statusBar()->showMessage(error1,5000);
@@ -1029,6 +1012,7 @@ void Dashboard::handlePeople(QString device){
             ui->statusBar->clearMessage();
     }
     delete qry;
+    pr.CloseDevice();
 }
 
 void Dashboard::readFromPR()
@@ -1108,6 +1092,7 @@ void Dashboard::readFromPR()
                         {
                             QSound::play("sounds/beep.wav");
                             global_PERSONAL_DATA = QString::fromStdString(RUT).replace(" ","");
+                            qDebug()<<global_PERSONAL_DATA;
                             if(Foreign==true){
                                 QStringList name = QString::fromStdString(doc->FieldA(PR_DF_NAME)).split(" ");
                                 global_PATERNAL_SURNAME = name.at(0);
@@ -1142,6 +1127,7 @@ void Dashboard::readFromPR()
                 lib.ProcessEnd();
             }
         }
+
     }
     catch (gxException e) {
         lib.DisplExcp(e);
@@ -1319,8 +1305,7 @@ void Dashboard::loadLCD(){
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
 
-    qry->prepare("select id from record where state='O' and datetime_input like '"+QDate::currentDate().toString("yyyy-MM-dd")+"%'");
-    if(!qry->exec())
+    if(!qry->exec("select id from record where state='O' and datetime_input like '"+QDate::currentDate().toString("yyyy-MM-dd")+"%'"))
     {
         QMessageBox::critical(this,tr("Error:"),error1);
         statusBar()->showMessage(error1,5000);
@@ -1331,9 +1316,7 @@ void Dashboard::loadLCD(){
         while(qry->next())
             opened++;
     }
-
-    qry->prepare("select id from record where state='C' and datetime_output like '"+QDate::currentDate().toString("yyyy-MM-dd")+"%'");
-    if(!qry->exec())
+    if(!qry->exec("select id from record where state='C' and datetime_output like '"+QDate::currentDate().toString("yyyy-MM-dd")+"%'"))
     {
         QMessageBox::critical(this,tr("Error:"),error1);
         statusBar()->showMessage(error1,5000);
@@ -1344,9 +1327,7 @@ void Dashboard::loadLCD(){
         while(qry->next())
             closed++;
     }
-
-    qry->prepare("select id from record where state == 'O' and patent_input != '' and datetime_input like '"+QDate::currentDate().toString("yyyy-MM-dd")+"%'");
-    if(!qry->exec())
+    if(!qry->exec("select id from record where state ='O' and patent_input != '' and datetime_input like '"+QDate::currentDate().toString("yyyy-MM-dd")+"%'"))
     {
         QMessageBox::critical(this,tr("Error:"), qry->lastError().text()+" "+qry->executedQuery());
         statusBar()->showMessage(error1,5000);
@@ -1409,8 +1390,9 @@ void Dashboard::exit(){
 
 void Dashboard::on_actionSalir_triggered()
 {
-    delete ui;
-    Dashboard::exit();
+    // delete ui;
+    // Dashboard::exit();
+    QApplication::quit();
 }
 
 void Dashboard::on_actionExportar_triggered()
@@ -1474,6 +1456,7 @@ void Dashboard::clean(QString type, bool personalPanel)
         ui->lineEdit_maternalSurname->setText("");
         ui->lineEdit_profile->setText("");
         ui->lineEdit_company->setText("");
+        ui->lineEdit_position->setText("");
         QPixmap user(":images/User-blue-icon.png");
         ui->label_user->setPixmap(user);
     }
@@ -1533,11 +1516,12 @@ Dashboard::~Dashboard()
 
 void Dashboard::on_actionCerrar_Sesi_n_triggered()
 {
-    this->close();
+    //this->close();
     Logger::insert2Logger(rutSignin," INFO ","Sesion closed.");
-    rutSignin.clear();
-    Login login(this);
-    login.exec();
+    connection temp;
+    temp.connClose();
+    qApp->quit();
+    QProcess::startDetached(qApp->arguments()[0],qApp->arguments());
 }
 
 void Dashboard::showTime()
@@ -1546,6 +1530,8 @@ void Dashboard::showTime()
     QString datetimetext = dateTime.toString("yyyy-MM-dd");
     ui->label_currentDate->setText(datetimetext);
     ui->label_currentDate->setStyleSheet("color: rgb(228, 115, 75);");
+    //on_actionActualizar_triggered();
+
 }
 
 void Dashboard::on_actionImportarPersonas_triggered()
@@ -1982,33 +1968,26 @@ void Dashboard::on_actionDiario_triggered()
 }
 
 void Dashboard::serialReceived(){
-    serialBuffer ="";
+
+    serialBuffer = "";
+    serialData = "";
     serialData = RTScan->readAll();
-    QString rut;
-    if(serialData.length()==4){
-        connection conn;
-        QString qr=QString::fromStdString(serialData.toStdString());
-        qDebug()<<"codigo qr: "+qr;
-        rut = conn.getFirstFromDb(rutSignin,"select rut from people where qrcode='"+qr+"'");
-        qDebug()<<"select rut from people where qrcode='"+qr+"'";
-    }
-    else if(serialData.length()>4){
-        serialBuffer += QString::fromStdString(serialData.toStdString());
-        QStringList bufferSplit = serialBuffer.split(" ");
-        rut= bufferSplit[0].toUtf8();
-        serialData="";
-        bufferSplit.clear();
-        serialBuffer="";
-        qDebug()<<": "+rut;
-    }
-    else if(rut.startsWith("https"))
+    serialBuffer += QString::fromStdString(serialData.toStdString());
+    QStringList bufferSplit = serialBuffer.split(" ");
+    QString rut = bufferSplit[0].toUtf8();
+    serialData="";
+    bufferSplit.clear();
+    serialBuffer="";
+    qDebug()<<"raw: "+rut;
+
+    if(rut.startsWith("https"))
     {
         //52 hasta 60 contiene el rut.
         rut = rut.mid(52,8); // 8 digitos a partir del 52.
         if(rut.endsWith("-"))
             rut.remove("-");
     }
-    else if(rut.at(0).isDigit()&&rut.length()>4){
+    else if(rut.at(0).isDigit()){
         rut.resize(8);
     }
     qDebug()<<"Rut: " + rut;
@@ -2081,3 +2060,27 @@ void Dashboard::on_pushButton_updatePic_clicked()
         }
     }
 }
+
+void Dashboard::on_actionEnrolar_triggered()
+{
+    PERSONAL_DATA="";
+    GIVENNAME="";
+    MATERNAL_SUR="";
+    PATERNAL_SUR="";
+
+    if(comboScanIsOpen()==true)
+    {
+        pr.CloseDevice();
+        formcs Formcs(this);
+        Formcs.exec();
+        on_actionActualizar_triggered();
+    }else if(comboScanIsOpen()==false){
+        QMessageBox::warning(this,tr("ERROR"),tr("Dispositivo Enrolador(COMBOSCAN), no se encuentra conectado, Verifique"));
+
+    }
+}
+/*void Dashboard::quitAplication()
+{
+ QCoreApplication::quit();
+}*/
+
