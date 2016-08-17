@@ -1,5 +1,9 @@
 # README #
 
+This repo contain the main code of all the other repos. First update the code here then in the others repo.
+
+Clean version of AccessControl desktop with SQlite,PostgreSQL and SQL Server 2008. In case to add a new database or a enhancement for the program, Please update these repos
+
 ### What is this repository for? ###
 
 * Uncompiled source
