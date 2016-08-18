@@ -413,7 +413,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_input">
      <attribute name="title">
@@ -786,6 +786,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionRegistro_Manual"/>
+   <addaction name="separator"/>
+   <addaction name="actionEnrolar"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -1026,6 +1028,11 @@
   <action name="actionDetectar_RTScan">
    <property name="text">
     <string>Detectar RTScan</string>
+   </property>
+  </action>
+ <action name="actionEnrolar">
+   <property name="text">
+    <string>Enrolar</string>
    </property>
   </action>
  </widget>

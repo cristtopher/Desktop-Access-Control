@@ -19,7 +19,7 @@ IndividualReport::IndividualReport(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("Control de accesos - Exportar");
-
+	ui->lineEdit_rut->setFocus();
     ui->lineEdit->setText(QDir::homePath()+"/"+QStandardPaths::displayName(QStandardPaths::DesktopLocation)+"/Reporte_individual.xls");
     ui->calendarWidget->setMaximumDate(QDate::currentDate());
     ui->calendarWidget_2->setMaximumDate(QDate::currentDate());
@@ -43,8 +43,7 @@ void IndividualReport::on_pushButton_search_clicked()
         QPixmap user(":images/User-blue-icon.png");
         connection conn;
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->prepare("select p.names, p.paternal_surname, p.maternal_surname, c.name, p.picture from people as p left JOIN company as c on p.rut_company=c.rut where p.rut='" + ui->lineEdit_rut->text()+"'");
-        if(!qry->exec())
+        if(!qry->exec("select p.names, p.paternal_surname, p.maternal_surname, c.name, p.picture from people as p left JOIN company as c on p.rut_company=c.rut where p.rut='" + ui->lineEdit_rut->text()+"'"))
         {
             QMessageBox::critical(this,tr("Error al realizar la busqueda"),error1);
             Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());
@@ -122,8 +121,8 @@ void IndividualReport::on_pushButton_clicked()
 
         connection conn;
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->prepare("select r.id,r.state,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,p.birthdate,na.name,p.cellphone,c.name,pro.name,po.name,fr.name,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour,r.type,r.datetime_input,r.datetime_output,r.patent_input,r.patent_output,us.names,r.authorized_by,r.pension_quotes,r.security_elements,r.comment from record as r left join people as p on r.rut_people=p.rut left join nationality as na on p.code_nationality=na.code left join company as c on p.rut_company=c.rut left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as fr on p.id_frequency=fr.id inner join users as us on r.rut_user=us.rut where r.rut_people='"+ui->lineEdit_rut->text()+"' and r.datetime_input between '"+startDate+" "+startHour+"' and '"+endDate+" "+endHour+"'");
-        if(!qry->exec())
+        if(!qry->exec("select r.id,r.state,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,p.birthdate,na.name,p.cellphone,c.name,pro.name,po.name,fr.name,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour,r.type,r.datetime_input,r.datetime_output,r.patent_input,r.patent_output,us.names,r.authorized_by,r.pension_quotes,r.security_elements,r.comment from record as r left join people as p on r.rut_people=p.rut left join nationality as na on p.code_nationality=na.code left join company as c on p.rut_company=c.rut left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as fr on p.id_frequency=fr.id inner join users as us on r.rut_user=us.rut where r.rut_people='"+ui->lineEdit_rut->text()+"' and r.datetime_input between '"+startDate+" "+startHour+"' and '"+endDate+" "+endHour+"'"))
+
         {
             qApp->beep();
             QMessageBox::critical(this,tr("Error:"), qry->lastError().text());
@@ -226,9 +225,11 @@ void IndividualReport::on_pushButton_clicked()
                     state = "RECHAZADO POR NO CUMPLIR REQUERIMIENTOS PREVISIONALES DE SUBCONTRATISTA";
                 else if(qry->value(STATE).toString()=="RNS")
                     state = "RECHAZADO POR NO CUMPLIR REQUERIMIENTOS SEGURIDAD PARA SUBCONTRATISTA";
+					else if(qry->value(STATE).toString()=="E")
+                    state = "ENROLAMIENTO";
 
                 xlsx.write(row,2, state); //estado
-                xlsx.write(row,3, qry->value(RUT_PEOPLE).toString()); //rut
+                xlsx.write(row,3, qry->value(RUT_PEOPLE).toString().toUpper()); //rut
                 xlsx.write(row,4, qry->value(NAMES).toString()); //nombres
                 xlsx.write(row,5, qry->value(PATERNAL_SURNAME).toString()); //ap paterno
                 xlsx.write(row,6, qry->value(MATERNAL_SURNAME).toString()); //ap materno

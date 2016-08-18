@@ -13,6 +13,7 @@ Login::Login(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Login)
 {
+    conn.connOpen();
     ui->setupUi(this);
     this->setWindowTitle("Login - Patagonia Wings");
     QPixmap user(":/images/User-blue-icon.png");
@@ -39,12 +40,10 @@ void Login::on_pushButton_open_clicked()
     }
     else
     {
-        connection conn;
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->prepare("select rut,password from users where rut='"+
+        if(qry->exec("select rut,password from users where rut='"+
                      ui->lineEdit_rut->text()+"' and password='"+
-                     ui->lineEdit_password->text()+"'");
-        if(qry->exec())
+                     ui->lineEdit_password->text()+"'"))
         {
             int count=0;
             while(qry->next())
@@ -54,9 +53,9 @@ void Login::on_pushButton_open_clicked()
                 //User and password is correct
                 rutSignin = ui->lineEdit_rut->text();
                 Logger::insert2Logger(ui->lineEdit_rut->text()," INFO ","Sign in recorded");
-
-                this->hide();
-
+				Dashboard *dash=new Dashboard(0);               
+			    dash->show();
+                close();
                 QSplashScreen *splash=new QSplashScreen;
                 splash->setPixmap(QPixmap(":images/logo.png"));
                 splash->show();
@@ -89,7 +88,8 @@ void Login::on_lineEdit_password_textChanged()
 void Login::on_pushButton_cancel_clicked()
 {
     rutSignin = "";
-    this->close();
+    
 
+	qApp->exit();
 
 }

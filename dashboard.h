@@ -10,6 +10,10 @@
 #include <QAxObject>
 #include <iostream>
 
+extern QString PERSONAL_DATA; //rut.
+extern QString GIVENNAME;
+extern QString MATERNAL_SUR;
+extern QString PATERNAL_SUR;
 namespace Ui {
 class Dashboard;
 }
@@ -120,6 +124,7 @@ private slots:
 
     void on_pushButton_updatePic_clicked();
 
+	void on_actionEnrolar_triggered();
 private:
     Ui::Dashboard *ui;
     enum people

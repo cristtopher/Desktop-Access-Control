@@ -32,30 +32,27 @@ People::People(QWidget *parent) :
 
         QSqlQueryModel * nacionalityModal=new QSqlQueryModel();
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->prepare("select name from nationality order by name asc");
-        qry->exec();
+        qry->exec("select name from nationality order by name asc");
         nacionalityModal->setQuery(*qry);
         ui->comboBox_nationality->setModel(nacionalityModal);
         ui->comboBox_nationality->setCurrentIndex(ui->comboBox_nationality->findText("Chile"));
 
         QSqlQueryModel * profileModal=new QSqlQueryModel();
-        qry->prepare("select name from profile order by name asc");
-        qry->exec();
+        qry->exec("select name from profile order by name asc");
+
         profileModal->setQuery(*qry);
         ui->comboBox_profile->setModel(profileModal);
         ui->comboBox_profile->setCurrentIndex(-1);
 
         QSqlQueryModel * positionModal=new QSqlQueryModel();
-        qry->prepare("select name from position order by name asc");
-        qry->exec();
+        qry->exec("select name from position order by name asc");
         positionModal->setQuery(*qry);
         ui->comboBox_position->setModel(positionModal);
         ui->comboBox_position->setCurrentIndex(-1);
 
         QSqlQueryModel * companyModal=new QSqlQueryModel();
 //        qry->prepare("select name || ' (' || rut || ')' from company order by name asc");
-        qry->prepare("select name from company order by name asc");
-        qry->exec();
+        qry->exec("select name from company order by name asc");
         companyModal->setQuery(*qry);
         ui->comboBox_company->setModel(companyModal);
         ui->comboBox_company->setCurrentIndex(-1);
@@ -65,8 +62,7 @@ People::People(QWidget *parent) :
         ui->comboBox_company->setCompleter(completer);
 
         QSqlQueryModel * frequencyModal=new QSqlQueryModel();
-        qry->prepare("select name from frequency order by name asc");
-        qry->exec();
+        qry->exec("select name from frequency order by name asc");
         frequencyModal->setQuery(*qry);
         ui->comboBox_frequency->setModel(frequencyModal);
         ui->comboBox_frequency->setCurrentIndex(ui->comboBox_frequency->findText("TEMPORAL"));
@@ -294,8 +290,7 @@ void People::on_tableView_clicked(const QModelIndex &index)
         QString rut = ui->tableView->model()->data(index).toString();
         connection conn;
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->prepare("select names,paternal_surname,maternal_surname,birthdate,email,cellphone,na.name,co.name,fr.name,pos.name,pro.name,p.state,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour from people as p left join nationality as na on p.code_nationality=na.code left join company as co on p.rut_company=co.rut left join frequency as fr on p.id_frequency=fr.id left join position as pos on p.id_position=pos.id left join profile as pro on p.id_profile=pro.id where p.rut = '"+rut+"'");
-        if(qry->exec()){
+        if(qry->exec("select names,paternal_surname,maternal_surname,birthdate,email,cellphone,na.name,co.name,fr.name,pos.name,pro.name,p.state,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour from people as p left join nationality as na on p.code_nationality=na.code left join company as co on p.rut_company=co.rut left join frequency as fr on p.id_frequency=fr.id left join position as pos on p.id_position=pos.id left join profile as pro on p.id_profile=pro.id where p.rut = '"+rut+"'")){
             qDebug()<<qry->lastQuery();
             while (qry->next()) {
                 ui->lineEdit_rut->setText(rut);
@@ -417,14 +412,13 @@ void People::on_pushButton_update_clicked()
     QString cellphone = ui->lineEdit_cellphone->text();
     QString email = ui->lineEdit_email->text();
 
-    qry->prepare("UPDATE people SET names='"+ui->lineEdit_names->text()+
+    if(!qry->exec("UPDATE people SET names='"+ui->lineEdit_names->text()+
                  "',paternal_surname='"+ui->lineEdit_paternal_surname->text()+"',maternal_surname='"+ui->lineEdit_maternal_surname->text()+
                  "',birthdate='"+ui->dateEdit_birthdate->text()+"',email='"+email+"',cellphone='"+
                  cellphone+"',start_authorized_hour='"+ui->timeEdit_start->text()+"',end_authorized_hour='"+
                  ui->timeEdit_end->text()+"',state='"+state+"',start_authorized_date='"+ui->dateEdit_start->text()+"',end_authorized_date='"+ui->dateEdit_end->text()+
                  "',code_nationality='"+nationality+"',id_position='"+position+"',id_profile='"+profile+"',id_frequency='"+frequency+"',rut_company='"+company+"'"+
-                 " where rut='"+ui->lineEdit_rut->text()+"'");
-    if(!qry->exec())
+                 " where rut='"+ui->lineEdit_rut->text()+"'"))
     {
         QMessageBox::critical(this,tr("Error al registrar"),error1);
         Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());

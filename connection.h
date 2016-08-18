@@ -20,10 +20,10 @@ public:
     QSqlDatabase mydb;
     bool debug;
     bool isOpenDB(){
-        if(mydb.open())
-            return debug= true;
+        if(mydb.isOpen())
+            return true;
         else
-            return debug=false;
+            return false;
         qDebug() <<"boolean base de datos "+debug;
     }
 
