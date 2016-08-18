@@ -19,14 +19,12 @@ Users::Users(QWidget *parent) :
     ui->label_status->setPixmap(db_ok);
 
     QSqlQueryModel * companyModal=new QSqlQueryModel();
-    qry->prepare("select name from company");
-    qry->exec();
+    qry->exec("select name from company");
     companyModal->setQuery(*qry);
     ui->comboBox_company->setModel(companyModal);
 
     QSqlQueryModel * rolModal=new QSqlQueryModel();
-    qry->prepare("select name from rol");
-    qry->exec();
+    qry->exec("select name from rol");
     rolModal->setQuery(*qry);
     ui->comboBox_id_rol->setModel(rolModal);
 
@@ -72,8 +70,7 @@ void Users::loadTable(){
     connection conn;
     QSqlQueryModel * TableModal=new QSqlQueryModel();
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("select u.rut as Rut,u.names as Nombres,u.paternal_surname as 'Apellido Paterno',u.maternal_surname as 'Apellido Materno',c.name as Empresa,r.name as Rol from user as u left join company as c on u.rut_company=c.rut inner join rol as r on u.id_rol=r.id");
-    qry->exec();
+    qry->exec("select u.rut as Rut,u.names as Nombres,u.paternal_surname as 'Apellido Paterno',u.maternal_surname as 'Apellido Materno',c.name as Empresa,r.name as Rol from user as u left join company as c on u.rut_company=c.rut inner join rol as r on u.id_rol=r.id");
     TableModal->setQuery(*qry);
     ui->tableView->setModel(TableModal);
     delete qry;

@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <QTableWidgetItem>
 #include <QCompleter>
-#include <dashboard.h>
+
 
 
 
@@ -20,44 +20,41 @@ People::People(QWidget *parent) :
     this->setWindowTitle("Control de accesos - Administrador de personas");
     ui->pushButton_new->setEnabled(false);
 
-   // connection conn;
+    connection conn;
+        /*
     if(!conn.isOpen()){
         QMessageBox::critical(this,tr("ERROR"),tr("Error al establecer conexion con base de datos"));
         QPixmap db_bad(":images/Database-Delete-icon.png");
         ui->label_status->setPixmap(db_bad);
     }
     else
-    {
+    {*/
         QPixmap db_ok(":images/Database-Accept-icon.png");
         ui->label_status->setPixmap(db_ok);
         ui->lineEdit_rut->setFocus();
 
         QSqlQueryModel * nacionalityModal=new QSqlQueryModel();
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->prepare("select name from nationality order by name asc");
-        qry->exec();
+        qry->exec("select name from nationality order by name asc");
         nacionalityModal->setQuery(*qry);
         ui->comboBox_nationality->setModel(nacionalityModal);
         ui->comboBox_nationality->setCurrentIndex(ui->comboBox_nationality->findText("Chile"));
 
         QSqlQueryModel * profileModal=new QSqlQueryModel();
-        qry->prepare("select name from profile order by name asc");
-        qry->exec();
+        qry->exec("select name from profile order by name asc");
         profileModal->setQuery(*qry);
         ui->comboBox_profile->setModel(profileModal);
         ui->comboBox_profile->setCurrentIndex(-1);
 
         QSqlQueryModel * positionModal=new QSqlQueryModel();
-        qry->prepare("select name from position order by name asc");
-        qry->exec();
+        qry->exec("select name from position order by name asc");
         positionModal->setQuery(*qry);
         ui->comboBox_position->setModel(positionModal);
         ui->comboBox_position->setCurrentIndex(-1);
 
         QSqlQueryModel * companyModal=new QSqlQueryModel();
 //        qry->prepare("select name || ' (' || rut || ')' from company order by name asc");
-        qry->prepare("select name from company order by name asc");
-        qry->exec();
+        qry->exec("select name from company order by name asc");
         companyModal->setQuery(*qry);
         ui->comboBox_company->setModel(companyModal);
         ui->comboBox_company->setCurrentIndex(-1);
@@ -67,8 +64,7 @@ People::People(QWidget *parent) :
         ui->comboBox_company->setCompleter(completer);
 
         QSqlQueryModel * frequencyModal=new QSqlQueryModel();
-        qry->prepare("select name from frequency order by name asc");
-        qry->exec();
+        qry->exec("select name from frequency order by name asc");
         frequencyModal->setQuery(*qry);
         ui->comboBox_frequency->setModel(frequencyModal);
         ui->comboBox_frequency->setCurrentIndex(ui->comboBox_frequency->findText("TEMPORAL"));
@@ -97,7 +93,7 @@ People::People(QWidget *parent) :
 
         loadTable("default");
     }
-}
+//}
 
 People::~People()
 {
@@ -105,7 +101,7 @@ People::~People()
 }
 
 void People::loadTable(QString query){
-   // connection conn;
+   connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
     if(query=="default")
         qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
@@ -317,9 +313,9 @@ void People::on_tableView_clicked(const QModelIndex &index)
                     ui->comboBox_nationality->setCurrentIndex(index_nationality);
 
                 int index_company = ui->comboBox_company->findText(qry->value(7).toString());
-                if (index_company != -1){ // -1 for not found
+                if (index_company != -1)// -1 for not found
                     ui->comboBox_company->setCurrentIndex(index_company);
-                }
+                
                 else
                     ui->comboBox_company->setCurrentIndex(-1);
 
@@ -402,7 +398,7 @@ void People::on_tableView_activated(const QModelIndex &index)
 
 void People::on_pushButton_update_clicked()
 {
-  //  connection conn;
+    connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
 
     QString company=conn.getFirstFromDb(rutSignin,"select rut from company where name = '"+ui->comboBox_company->currentText()+"'");
@@ -418,14 +414,13 @@ void People::on_pushButton_update_clicked()
     QString cellphone = ui->lineEdit_cellphone->text();
     QString email = ui->lineEdit_email->text();
 
-    qry->prepare("UPDATE people SET names='"+ui->lineEdit_names->text()+
+   if(!qry->exec("UPDATE people SET names='"+ui->lineEdit_names->text()+
                  "',paternal_surname='"+ui->lineEdit_paternal_surname->text()+"',maternal_surname='"+ui->lineEdit_maternal_surname->text()+
                  "',birthdate='"+ui->dateEdit_birthdate->text()+"',email='"+email+"',cellphone='"+
                  cellphone+"',start_authorized_hour='"+ui->timeEdit_start->text()+"',end_authorized_hour='"+
                  ui->timeEdit_end->text()+"',state='"+state+"',start_authorized_date='"+ui->dateEdit_start->text()+"',end_authorized_date='"+ui->dateEdit_end->text()+
                  "',code_nationality='"+nationality+"',id_position='"+position+"',id_profile='"+profile+"',id_frequency='"+frequency+"',rut_company='"+company+"'"+
-                 " where rut='"+ui->lineEdit_rut->text()+"'");
-    if(!qry->exec())
+                 " where rut='"+ui->lineEdit_rut->text()+"'"))
     {
         QMessageBox::critical(this,tr("Error al registrar"),error1);
         Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());
@@ -443,7 +438,7 @@ void People::on_pushButton_update_clicked()
 
 void People::on_pushButton_add_clicked()
 {
-    //connection conn;
+    connection conn;
     if(People::validateChnId(ui->lineEdit_rut->text()))
     {
         if(!ui->lineEdit_names->text().isEmpty())
@@ -481,14 +476,14 @@ void People::on_pushButton_add_clicked()
                             else
                             {
                                 QString query;
-                                if(ui->comboBox_frequency->itemText(ui->comboBox_frequency->currentIndex())=="PERMANENTE")
+                                if(ui->comboBox_frequency->itemText(ui->comboBox_frequency->currentIndex())=="PERMANENTE"){
                                     query=tr("insert into people (rut, names, paternal_surname, maternal_surname, birthdate, rut_company, state, code_nationality, ")
                                         + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
                                         +"id_profile, id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"
                                         +ui->lineEdit_maternal_surname->text()+"','"+ui->dateEdit_birthdate->text()+"','"
                                         +rut_company+"','"+state+"','"+id_nationality+"','"+ui->timeEdit_start->text()+"','"+ui->timeEdit_end->text()+"','"+ui->dateEdit_start->text()+"','""','"
                                         +ui->lineEdit_cellphone->text()+"','"+ui->lineEdit_email->text()+"','"+id_position+"','"+id_profile+"','"+id_frequency+"')";
-                                else
+                                }else
                                     query=tr("insert into people (rut, names, paternal_surname, maternal_surname, birthdate, rut_company, state, code_nationality, ")
                                         + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
                                         +"id_profile, id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"

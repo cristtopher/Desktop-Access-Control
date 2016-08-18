@@ -13,8 +13,7 @@ UserProfile::UserProfile(QWidget *parent) :
 
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("select * from user where rut='"+rutSignin+"'");
-    qry->exec();
+    qry->exec("select * from user where rut='"+rutSignin+"'");
     while(qry->next()){
         ui->lineEdit_rut->setText(rutSignin);
         ui->lineEdit_names->setText(qry->value(1).toString());
@@ -33,10 +32,9 @@ void UserProfile::on_pushButton_clicked()
 {
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("UPDATE user SET names = '"+ui->lineEdit_names->text()+
+    if(!qry->exec("UPDATE user SET names = '"+ui->lineEdit_names->text()+
                  "', paternal_surname = '"+ui->lineEdit_paternal_surname->text()+"', maternal_surname = '"+ui->lineEdit_maternal_surname->text()+
-                 "', password = '"+ui->lineEdit_password->text()+"' where rut='"+rutSignin+"'");
-    if(!qry->exec())
+                 "', password = '"+ui->lineEdit_password->text()+"' where rut='"+rutSignin+"'"))
     {
         QMessageBox::critical(this,tr("Error al actualizar"),error1);
         Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());

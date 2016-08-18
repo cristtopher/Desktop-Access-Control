@@ -20,7 +20,7 @@ ExportRecords::ExportRecords(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Control de accesos - Exportar");
 
-    ui->lineEdit->setText(QDir::homePath()+"/"+QStandardPaths::displayName(QStandardPaths::DesktopLocation)+"/Reporte.xls");
+    ui->lineEdit->setText(QDir::homePath()+"/"+QStandardPaths::displayName(QStandardPaths::DesktopLocation)+"/Reporte.xlsx");
     ui->calendarWidget->setMaximumDate(QDate::currentDate());
     ui->calendarWidget_2->setMaximumDate(QDate::currentDate());
     ui->timeEdit_2->setTime(QTime::fromString("23:59"));
@@ -49,8 +49,7 @@ void ExportRecords::on_pushButton_clicked()
 
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("select r.id,r.state,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,p.birthdate,na.name,p.cellphone,c.name,pro.name,po.name,fr.name,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour,r.type,r.datetime_input,r.datetime_output,r.patent_input,r.patent_output,us.names,r.authorized_by,r.pension_quotes,r.security_elements,r.comment from record as r left join people as p on r.rut_people=p.rut left join nationality as na on p.code_nationality=na.code left join company as c on p.rut_company=c.rut left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as fr on p.id_frequency=fr.id inner join user as us on r.rut_user=us.rut where r.datetime_input between '"+startDate+" "+startHour+"' and '"+endDate+" "+endHour+"'");
-    if(!qry->exec())
+    if(!qry->exec("select r.id,r.state,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,p.birthdate,na.name,p.cellphone,c.name,pro.name,po.name,fr.name,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour,r.type,r.datetime_input,r.datetime_output,r.patent_input,r.patent_output,us.names,r.authorized_by,r.pension_quotes,r.security_elements,r.comment from record as r left join people as p on r.rut_people=p.rut left join nationality as na on p.code_nationality=na.code left join company as c on p.rut_company=c.rut left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as fr on p.id_frequency=fr.id inner join user as us on r.rut_user=us.rut where r.datetime_input between '"+startDate+" "+startHour+"' and '"+endDate+" "+endHour+"'"))
     {
         qApp->beep();
         QMessageBox::critical(this,tr("Error:"), qry->lastError().text());
@@ -70,8 +69,8 @@ void ExportRecords::on_pushButton_clicked()
 
         //property
         xlsx.setDocumentProperty("title", "Report records");
-        xlsx.setDocumentProperty("creator", "Control acces software");
-        xlsx.setDocumentProperty("company", "Patagonia Winds");
+        xlsx.setDocumentProperty("creator", "Access Control software");
+        xlsx.setDocumentProperty("company", "AXXEZO S.A");
         xlsx.setDocumentProperty("category", "Spreadsheets Report");
         xlsx.setDocumentProperty("description", "Report records the date and time range");
 
@@ -155,9 +154,11 @@ void ExportRecords::on_pushButton_clicked()
                 state = "RECHAZADO POR NO CUMPLIR REQUERIMIENTOS PREVISIONALES DE SUBCONTRATISTA";
             else if(qry->value(STATE).toString()=="RNS")
                 state = "RECHAZADO POR NO CUMPLIR REQUERIMIENTOS SEGURIDAD PARA SUBCONTRATISTA";
+            else if(qry->value(STATE).toString()=="E")
+                state = "ENROLAMIENTO";
 
             xlsx.write(row,2, state); //estado
-            xlsx.write(row,3, qry->value(RUT_PEOPLE).toString()); //rut
+            xlsx.write(row,3, qry->value(RUT_PEOPLE).toString().toUpper()); //rut
             xlsx.write(row,4, qry->value(NAMES).toString()); //nombres
             xlsx.write(row,5, qry->value(PATERNAL_SURNAME).toString()); //ap paterno
             xlsx.write(row,6, qry->value(MATERNAL_SURNAME).toString()); //ap materno
@@ -177,6 +178,10 @@ void ExportRecords::on_pushButton_clicked()
                 type = "AUTOMATICO";
             else
                 type = "MANUAL";
+           /* if(qry->value(STATE).toString()=="E" && qry->value(TYPE).toString()=="A")
+                type = "AUTOMATICO";
+            else
+                type = "MANUAL";*/
 
             xlsx.write(row,18, type); //Type
             xlsx.write(row,19, QDateTime::fromString(qry->value(DATETIME_INPUT).toString(),"yyyy-MM-dd HH:mm")); //entrada

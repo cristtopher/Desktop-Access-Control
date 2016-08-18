@@ -20,8 +20,7 @@ void Companies::loadTable(){
     connection conn;
     QSqlQueryModel * TableModal=new QSqlQueryModel();
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("select rut as 'RUN', name as 'Razón Social' from company order by name asc");
-    qry->exec();
+    qry->exec("select rut as 'RUN', name as 'Razón Social' from company order by name asc");
     TableModal->setQuery(*qry);
     ui->tableView->setModel(TableModal);
     ui->tableView->setColumnWidth(1,100);

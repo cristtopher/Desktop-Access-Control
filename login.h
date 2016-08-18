@@ -2,7 +2,9 @@
 #define LOGIN_H
 
 #include <QDialog>
+#include <connection.h>
 
+extern connection conn;
 namespace Ui {
 class Login;
 }

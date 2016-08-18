@@ -33,7 +33,9 @@
 
 PassportReader pr1;  /* Object for the PR system */
 QSerialPort *RTScan1; /* Object for the RTscan */
-//connection conn;
+QTime currentTime = QTime::currentTime();
+QDate currentDate = QDate::currentDate();
+connection conn1;
 Lib lib1;
 
 QString global_PERSONAL_DATA1; //rut.
@@ -113,13 +115,13 @@ formcs::formcs(QWidget *parent) :
     ui->pushButton_2->setFocus();
 
     //Set the information in the combobox profile
-    QSqlQuery* qry=new QSqlQuery(conn.mydb);
+    QSqlQuery* qry=new QSqlQuery(conn1.mydb);
     QSqlQueryModel * profileModal=new QSqlQueryModel();
     qry->exec("select name from profile order by name asc");
     profileModal->setQuery(*qry);
     ui->comboBox_profile->setModel(profileModal);
     ui->comboBox_profile->setCurrentIndex(-1);
-    delete qry;
+    
 }
 
 formcs::~formcs()
@@ -130,6 +132,7 @@ formcs::~formcs()
 
 void formcs::on_CancelButton_formcs_clicked()
 {
+	clean();
     pr1.CloseDevice();
     formcs::close();
 }
@@ -441,7 +444,7 @@ void formcs::on_pushButton_renewImage_clicked()
 void formcs::on_lineEdit_Enterprise_textChanged(const QString &arg1)
 {
     QStringList companyNames;
-    QSqlQuery* query=new QSqlQuery(conn.mydb);
+    QSqlQuery* query=new QSqlQuery(conn1.mydb);
 
     //fill the list with company names
     if(query->exec("select name from company")){
@@ -466,12 +469,11 @@ void formcs::on_lineEdit_Enterprise_textChanged(const QString &arg1)
             ui->Button_addPosition->setEnabled(true);
         }
     }*/
-    delete query;
 }
 void formcs::on_lineEdit_position_textChanged(const QString &arg1)
 {
     QStringList positionNames;
-    QSqlQuery* query=new QSqlQuery(conn.mydb);
+    QSqlQuery* query=new QSqlQuery(conn1.mydb);
     //fill the list with company names
     if(query->exec("select name from position")){
         int i=0;
@@ -483,7 +485,6 @@ void formcs::on_lineEdit_position_textChanged(const QString &arg1)
     QCompleter *completer = new QCompleter(positionNames, this);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     ui->lineEdit_position->setCompleter(completer);
-    delete query;
 }
 
 
@@ -506,7 +507,7 @@ void formcs::on_acceptButton_formcs_clicked()
     QString profile;
     QString position;
     bool rut;
-    QSqlQuery* query=new QSqlQuery(conn.mydb);
+    QSqlQuery* query=new QSqlQuery(conn1.mydb);
     //validate rut
     if(query->exec("select * from people where rut='"+ui->lineEdit_rut->text()+"'")){
         if(query->next()&&!ui->lineEdit_rut->text().isEmpty()){
@@ -551,30 +552,65 @@ void formcs::on_acceptButton_formcs_clicked()
     if(!company.isEmpty()&&!position.isEmpty()&&!profile.isEmpty()&&rut==false&&!ui->lineEdit_appMat->text().isEmpty()
             &&!ui->lineEdit_appPat->text().isEmpty()&&!ui->lineEdit_appMat->text().isEmpty()){
         QString frequency="2";
-        conn.insert2Db(rutSignin,"insert into people (rut,names,paternal_surname,maternal_surname,birthdate,state,code_nationality,picture,id_position,id_profile,rut_company,id_frequency) values ('"+ui->lineEdit_rut->text().toUpper()+"','"+ui->lineEdit_name->text().toUpper()+"','"+ui->lineEdit_appPat->text().toUpper()+"','"+ui->lineEdit_appMat->text().toUpper()+"','"+global_BIRTH_DATE1+"','I','"+global_CODE_NATIONALITY1+"','"+imgPath+"','"+position+"','"+profile+"','"+company+"','"+frequency+"')");
+        conn1.insert2Db(rutSignin,"insert into people (rut,names,paternal_surname,maternal_surname,birthdate,state,code_nationality,picture,id_position,id_profile,rut_company,id_frequency) values ('"+ui->lineEdit_rut->text().toUpper()+"','"+ui->lineEdit_name->text().toUpper()+"','"+ui->lineEdit_appPat->text().toUpper()+"','"+ui->lineEdit_appMat->text().toUpper()+"','"+global_BIRTH_DATE1+"','I','"+global_CODE_NATIONALITY1+"','"+imgPath+"','"+position+"','"+profile+"','"+company+"','"+frequency+"')");
+        if(ui->button_manualRegistration->isEnabled())
+            query->exec("insert into record (datetime_input,rut_people,rut_user,type,state) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','"+'E'+"')");
+        else
+            query->exec("insert into record (datetime_input,rut_people,rut_user,type,state) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+ui->lineEdit_rut->text()+"','"+rutSignin+"','A','"+'E'+"')");
         QMessageBox::information(this,tr("Enhorabuena"),"El  usuario: "+ui->lineEdit_rut->text()+" ha sido ingresado satisfactoriamente");
         pr1.CloseDevice();
         imgPath="";
-        QPixmap blueIconUser(":images/User-blue-icon.png");
-        ui->formcs_labelImage->setPixmap(blueIconUser);
-        ui->lineEdit_rut->setText("");
-        ui->lineEdit_name->setText("");
-        ui->lineEdit_Enterprise->setText("");
-        ui->lineEdit_appMat->setText("");
-        ui->lineEdit_appPat->setText("");
-        ui->lineEdit_position->setText("");
-        ui->comboBox_profile->setCurrentIndex(-1);
+        clean();
         company="";
         profile="";
         position="";
         rut=false;
         ui->button_manualRegistration->setEnabled(true);
         ui->pushButton_2->setEnabled(true);
-
     }
     else
         if(ui->lineEdit_Enterprise->text().isEmpty()||ui->lineEdit_position->text().isEmpty()||ui->comboBox_profile->currentText().isEmpty()||ui->lineEdit_rut->text().isEmpty()||ui->lineEdit_appMat->text().isEmpty()||
-                ui->lineEdit_appPat->text().isEmpty()||ui->lineEdit_name->text().isEmpty())
+			 	 ui->lineEdit_appPat->text().isEmpty()||ui->lineEdit_name->text().isEmpty())
             QMessageBox::critical(this,tr("PRECAUCION"),tr("Verifique que todo los campos esten completos y luego presione aceptar nuevamente"));
-    delete query;
+}
+
+
+
+
+
+void formcs::on_lineEdit_rut_textChanged(const QString &arg1)
+{
+    arg1.toUpper();
+    ui->lineEdit_rut->setText(ui->lineEdit_rut->text().toUpper());
+}
+
+void formcs::on_lineEdit_name_textChanged(const QString &arg1)
+{
+    ui->lineEdit_name->setText(ui->lineEdit_name->text().toUpper());
+}
+
+void formcs::on_lineEdit_appPat_textChanged(const QString &arg1)
+{
+    ui->lineEdit_appPat->setText(ui->lineEdit_appPat->text().toUpper());
+}
+
+void formcs::on_lineEdit_appMat_textChanged(const QString &arg1)
+{
+    ui->lineEdit_appMat->setText(ui->lineEdit_appMat->text().toUpper());
+}
+void formcs::clean(){
+    //clear all
+    QPixmap blueIconUser(":images/User-blue-icon.png");
+    ui->formcs_labelImage->setPixmap(blueIconUser);
+    ui->lineEdit_rut->setText("");
+    ui->lineEdit_name->setText("");
+    ui->lineEdit_Enterprise->setText("");
+    ui->lineEdit_appMat->setText("");
+    ui->lineEdit_appPat->setText("");
+    ui->lineEdit_position->setText("");
+    ui->comboBox_profile->setCurrentIndex(-1);
+    PERSONAL_DATA="";
+    GIVENNAME="";
+    MATERNAL_SUR="";
+    PATERNAL_SUR="";
 }

@@ -16,13 +16,11 @@ Configuration::Configuration(QWidget *parent) :
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
 
     QSqlQueryModel * companyModal=new QSqlQueryModel();
-    qry->prepare("select name from company order by name asc");
-    qry->exec();
+    qry->exec("select name from company order by name asc");
     companyModal->setQuery(*qry);
     ui->comboBox->setModel(companyModal);
 
-    qry->prepare("select co.key, co.location, em.name from configuration as co inner join company as em on co.rut_company=em.rut where co.key=(select key from user where rut = '"+rutSignin+"')");
-    qry->exec();
+    qry->exec("select co.key, co.location, em.name from configuration as co inner join company as em on co.rut_company=em.rut where co.key=(select key from user where rut = '"+rutSignin+"')");
     while(qry->next()){
         ui->lineEdit_key->setText(qry->value(0).toString());
         ui->lineEdit_place->setText(qry->value(1).toString());
@@ -36,8 +34,7 @@ Configuration::Configuration(QWidget *parent) :
     qry->clear();
 
     QSqlQueryModel * TableModal=new QSqlQueryModel();
-    qry->prepare("select name as Nombre,serial as Serial,baudrate as Baudrate from devices where key=(select key from user where rut = '"+rutSignin+"')");
-    qry->exec();
+    qry->exec("select name as Nombre,serial as Serial,baudrate as Baudrate from devices where key=(select key from user where rut = '"+rutSignin+"')");
     TableModal->setQuery(*qry);
     ui->tableView->setModel(TableModal);
 
@@ -75,11 +72,10 @@ void Configuration::on_pushButton_save_clicked()
 {
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("UPDATE configuration SET location = '"+ui->lineEdit_place->text()+
+    if(!qry->exec("UPDATE configuration SET location = '"+ui->lineEdit_place->text()+
                  "', rut_company = '"+ui->comboBox->currentIndex()+
                  "', rtscan_port = '"+ui->comboBox_rtscan->currentText()+
-                 "' where key='"+ui->lineEdit_key->text()+"'");
-    if(!qry->exec())
+                 "' where key='"+ui->lineEdit_key->text()+"'"))
     {
         QMessageBox::critical(this,tr("Error al actualizar"),error1);
         Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());

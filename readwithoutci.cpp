@@ -22,7 +22,7 @@ ReadWithoutCI::ReadWithoutCI(QWidget *parent) :
     ui->lineEdit_rut->setFocus();
     ui->label_user->setPixmap(user);
     connection conn;
-    if(conn.isOpen())
+    if(conn.isOpenDB())
         ui->label_status->setPixmap(db_bad);
     else
         ui->label_status->setPixmap(db_ok);
@@ -45,18 +45,20 @@ void ReadWithoutCI::on_pushButton_search_clicked()
         QPixmap user(":images/User-blue-icon.png");
         connection conn;
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->prepare("select p.names, p.paternal_surname, p.maternal_surname, c.name, pro.name, p.picture from people as p LEFT JOIN company as c on p.rut_company=c.rut LEFT JOIN profile as pro on p.id_profile=pro.id where p.rut='" + ui->lineEdit_rut->text()+"'");
-        if(!qry->exec())
+        if(!qry->exec("select p.names, p.paternal_surname, p.maternal_surname, c.name, pro.name, p.picture from people as p LEFT JOIN company as c on p.rut_company=c.rut LEFT JOIN profile as pro on p.id_profile=pro.id where p.rut='" + ui->lineEdit_rut->text()+"'"))
         {
             QMessageBox::critical(this,tr("Error al realizar la busqueda"),error1);
             Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());
         }
         else
         {
-            int count=0;
-            while(qry->next())
-            {
-                count++;
+             bool ishere=false;
+            if(qry->next()){
+
+                if(!qry->value(0).toString().isEmpty())
+                    ishere=true;
+                else
+                    ishere=false;
                 ui->lineEdit_names->setText(qry->value(0).toString());
                 ui->lineEdit_paternal_surname->setText(qry->value(1).toString());
                 ui->lineEdit_maternal_surname->setText(qry->value(2).toString());
@@ -68,8 +70,7 @@ void ReadWithoutCI::on_pushButton_search_clicked()
                 ui->lineEdit_patent_input->setText(conn.getFirstFromDb(rutSignin,"select patent_input from record where state='O' and rut_people='"+ui->lineEdit_rut->text()+"'"));
 
                 QSqlQueryModel *modal=new QSqlQueryModel();
-                qry->prepare("select datetime_input from record where state='O' and rut_people='"+ui->lineEdit_rut->text()+"'");
-                if(!qry->exec())
+                if(!qry->exec("select datetime_input from record where state='O' and rut_people='"+ui->lineEdit_rut->text()+"'"))
                 {
                     qApp->beep();
                     QMessageBox::critical(this,tr("Error al registrar"),error1);
@@ -97,12 +98,14 @@ void ReadWithoutCI::on_pushButton_search_clicked()
                     }
                 }
             }
-            if(count<1)
+        
+			if(ishere==false)
             {
                 qApp->beep();
                 QMessageBox::warning(this, tr("Alerta"), tr("Rut no encontrado"));
                 clean();
             }
+			 else{}
         }
         delete qry;
     }
@@ -112,8 +115,7 @@ QString ReadWithoutCI::verifyPeople()
 {
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("select state,start_authorized_date,end_authorized_date,start_authorized_hour,end_authorized_hour,id_frequency from people where rut='"+ui->lineEdit_rut->text()+"'");
-    if (!qry->exec())
+    if (!qry->exec("select state,start_authorized_date,end_authorized_date,start_authorized_hour,end_authorized_hour,id_frequency from people where rut='"+ui->lineEdit_rut->text()+"'"))
     {
         qApp->beep();
         QMessageBox::critical(this,tr("ERROR"),error1);

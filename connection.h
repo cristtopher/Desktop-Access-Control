@@ -20,19 +20,11 @@ public:
     bool debug;
 
     bool isOpenDB(){
-        if(mydb.open())
-            return debug= true;
-        else
-            return debug=false;
-        qDebug() <<"boolean base de datos "+debug;
-    }
-
-
-    bool isOpen(){
-        if(mydb.isOpen())
+         if(mydb.isOpen())
             return true;
         else
             return false;
+        qDebug() <<"boolean base de datos "+debug;
     }
 
     void connClose()
@@ -40,7 +32,8 @@ public:
         if(mydb.isOpen())
         {
             mydb.close();
-            mydb.removeDatabase(QSqlDatabase::defaultConnection);
+            mydb.removeDatabase(QSqlDatabase::defaultConnection);	
+			Logger::insert2Logger(rutSignin," ERROR ", "Base de datos cerrada correctamente");
         }
         else
             Logger::insert2Logger(rutSignin," ERROR ", "Tratando de cerrar DB ya cerrada...");
@@ -50,6 +43,7 @@ public:
     {
         mydb=QSqlDatabase::addDatabase("QSQLITE");
         mydb.setDatabaseName(QDir::currentPath()+"/db/AccessControl.db");
+        mydb.setPassword("axxezo2016");
 //        mydb.setDatabaseName("C:/Users/jmora/Desktop/db/AccessControl.db");
 //        mydb.setDatabaseName("E:/14116/db/AccessControl.db");
 

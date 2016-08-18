@@ -11,8 +11,7 @@ Positions::Positions(QWidget *parent) :
     connection conn;
     QSqlQueryModel * TableModal=new QSqlQueryModel();
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    qry->prepare("select name as 'Cargo' from position order by name asc");
-    qry->exec();
+    qry->exec("select name as 'Cargo' from position order by name asc");
     TableModal->setQuery(*qry);
     ui->tableView->setModel(TableModal);
     delete qry;

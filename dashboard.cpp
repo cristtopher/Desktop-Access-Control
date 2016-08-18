@@ -28,6 +28,7 @@
 #include "configuration.h"
 #include "dailyreport.h"
 #include "formcs.h"
+#include <login.h>
 
 #include <QtCore>
 #include "xlsxdocument.h"
@@ -79,12 +80,12 @@ QString PERSONAL_DATA;
 QString GIVENNAME;
 QString MATERNAL_SUR;
 QString PATERNAL_SUR;
-connection conn;
+
 
 
 PassportReader pr;  /* Object for the PR system */
 QSerialPort *RTScan; /* Object for the RTscan */
-//connection conn;
+connection conn;
 
 Dashboard::Dashboard(QWidget *parent) :
     QMainWindow(parent),
@@ -99,18 +100,13 @@ Dashboard::Dashboard(QWidget *parent) :
 
 
 
-    conn.connOpen();
+   // conn.connOpen();
 
   if(conn.isOpenDB())
        ui->label_status_db->setPixmap(okPix);
    else
        ui->label_status_db->setPixmap(badPix);
-    Login login(this);
-    login.exec();
-    /*if(loginWindow==true){
-        login.close();
-        loginWindow=false;
-    }*/
+    
     if(rutSignin.isEmpty())
         on_actionSalir_triggered();
 
@@ -1518,8 +1514,8 @@ void Dashboard::on_actionCerrar_Sesi_n_triggered()
 {
     //this->close();
     Logger::insert2Logger(rutSignin," INFO ","Sesion closed.");
-    connection temp;
-    temp.connClose();
+   // connection temp;
+   // temp.connClose();
     qApp->quit();
     QProcess::startDetached(qApp->arguments()[0],qApp->arguments());
 }
