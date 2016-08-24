@@ -15,6 +15,7 @@ extern QString PERSONAL_DATA; //rut.
 extern QString GIVENNAME;
 extern QString MATERNAL_SUR;
 extern QString PATERNAL_SUR;
+extern QSerialPort *RTScan;
 
 
 
@@ -131,6 +132,7 @@ private slots:
 
     void on_actionEnrolar_triggered();
 
+    void on_actionAdministrar_2_triggered();
 
 private:
     Ui::Dashboard *ui;

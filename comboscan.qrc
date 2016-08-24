@@ -20,5 +20,6 @@
         <file>images/logo.jpeg</file>
         <file>images/logo-oxxean.png</file>
         <file>images/axxezo.png</file>
+        <file>images/barcode_icon.png</file>
     </qresource>
 </RCC>

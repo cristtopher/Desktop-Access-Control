@@ -808,6 +808,8 @@
     <addaction name="separator"/>
     <addaction name="actionCerrar_Sesi_n"/>
     <addaction name="actionSalir"/>
+    <addaction name="separator"/>
+    <addaction name="actionAdministrar_2"/>
    </widget>
    <widget class="QMenu" name="menuHerramientas">
     <property name="title">
@@ -1033,6 +1035,11 @@
   <action name="actionEnrolar">
    <property name="text">
     <string>Enrolar</string>
+   </property>
+  </action>
+  <action name="actionAdministrar_2">
+   <property name="text">
+    <string>Administrar</string>
    </property>
   </action>
  </widget>

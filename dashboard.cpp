@@ -29,6 +29,7 @@
 #include "dailyreport.h"
 #include "formcs.h"
 #include <login.h>
+#include <administratormenu.h>
 
 #include <QtCore>
 #include "xlsxdocument.h"
@@ -44,6 +45,7 @@
 
 #include <QProgressDialog>
 #include <QtWidgets/QApplication>
+#include <administratormenu.h>
 
 bool loginWindow;
 
@@ -80,6 +82,7 @@ QString PERSONAL_DATA;
 QString GIVENNAME;
 QString MATERNAL_SUR;
 QString PATERNAL_SUR;
+QString codeAdministration;
 
 
 
@@ -100,12 +103,12 @@ Dashboard::Dashboard(QWidget *parent) :
 
 
 
-   // conn.connOpen();
+    // conn.connOpen();
 
-  if(conn.isOpenDB())
-       ui->label_status_db->setPixmap(okPix);
-   else
-       ui->label_status_db->setPixmap(badPix);
+    if(conn.isOpenDB())
+        ui->label_status_db->setPixmap(okPix);
+    else
+        ui->label_status_db->setPixmap(badPix);
     
     if(rutSignin.isEmpty())
         on_actionSalir_triggered();
@@ -1514,8 +1517,8 @@ void Dashboard::on_actionCerrar_Sesi_n_triggered()
 {
     //this->close();
     Logger::insert2Logger(rutSignin," INFO ","Sesion closed.");
-   // connection temp;
-   // temp.connClose();
+    // connection temp;
+    // temp.connClose();
     qApp->quit();
     QProcess::startDetached(qApp->arguments()[0],qApp->arguments());
 }
@@ -1964,7 +1967,6 @@ void Dashboard::on_actionDiario_triggered()
 }
 
 void Dashboard::serialReceived(){
-
     serialBuffer = "";
     serialData = "";
     serialData = RTScan->readAll();
@@ -1974,7 +1976,7 @@ void Dashboard::serialReceived(){
     serialData="";
     bufferSplit.clear();
     serialBuffer="";
-    qDebug()<<"raw: "+rut;
+    // qDebug()<<"raw: "+rut;
 
     if(rut.startsWith("https"))
     {
@@ -2079,4 +2081,10 @@ void Dashboard::on_actionEnrolar_triggered()
 {
  QCoreApplication::quit();
 }*/
-
+void Dashboard::on_actionAdministrar_2_triggered()
+{
+    disconnect(RTScan, SIGNAL(readyRead()),this,SLOT(serialReceived()));
+    administratorMenu admin(this);
+    admin.exec();
+    connect(RTScan, SIGNAL(readyRead()),this,SLOT(serialReceived()));
+}
