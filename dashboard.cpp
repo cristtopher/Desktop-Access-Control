@@ -144,7 +144,7 @@ Dashboard::Dashboard(QWidget *parent) :
     ui->comboBox_filtered->addItem("Patente Entrada","patent_input");
 
     // Set permissions
-    ui->actionAdministrarEmpresas->setEnabled(false);
+    ui->actionAdministrarEmpresas->setEnabled(true);
     ui->actionAdministrarCargos->setEnabled(false);
     ui->actionAdministrarPerfiles->setEnabled(false);
     switch (conn.getFirstFromDb(rutSignin,"select id_rol from user where rut='"+rutSignin+"'").toInt()) {
@@ -1391,7 +1391,7 @@ void Dashboard::on_actionSalir_triggered()
 {
     // delete ui;
     // Dashboard::exit();
-    QApplication::quit();
+    qApp->exit();
 }
 
 void Dashboard::on_actionExportar_triggered()

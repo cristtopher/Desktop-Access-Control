@@ -52,7 +52,7 @@ void ReadWithoutCI::on_pushButton_search_clicked()
         }
         else
         {
-             bool ishere=false;
+            bool ishere=false;
             if(qry->next()){
 
                 if(!qry->value(0).toString().isEmpty())
@@ -98,14 +98,14 @@ void ReadWithoutCI::on_pushButton_search_clicked()
                     }
                 }
             }
-        
-			if(ishere==false)
+
+            if(ishere==false)
             {
                 qApp->beep();
                 QMessageBox::warning(this, tr("Alerta"), tr("Rut no encontrado"));
                 clean();
             }
-			 else{}
+            else{}
         }
         delete qry;
     }
@@ -220,8 +220,8 @@ QString ReadWithoutCI::verifyPeople()
             else
             {
                 return "insert into record (datetime_input,rut_people,rut_user,type,state,comment,patent_input,patent_output) values ('"
-                            +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
-                            +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"')";
+                        +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
+                        +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"')";
             }
         }
         else if(freq != 1)
@@ -276,8 +276,8 @@ QString ReadWithoutCI::verifyPeople()
                 else
                 {
                     return "insert into record (datetime_input,rut_people,rut_user,type,state,comment,patent_input,patent_output) values ('"
-                                                +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
-                                                +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"')";
+                            +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
+                            +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"')";
                 }
 
             }
@@ -360,8 +360,8 @@ QString ReadWithoutCI::verifyPeople()
                     while(ok && authorizedBy.isEmpty());
                     if (ok){
                         return "insert into record (datetime_input,rut_people,rut_user,type,state,comment,patent_input,patent_output,authorized_by,pension_quotes,security_elements) values ('"
-                                    +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
-                                    +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"','"+authorizedBy+"','"+pension+"','"+security+"')";
+                                +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
+                                +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"','"+authorizedBy+"','"+pension+"','"+security+"')";
                     }
                     else{
                         // creo que hay que limpiar
@@ -370,15 +370,15 @@ QString ReadWithoutCI::verifyPeople()
                 else
                 {
                     return "insert into record (datetime_input,rut_people,rut_user,type,state,comment,patent_input,patent_output,pension_quotes,security_elements) values ('"
-                                +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
-                                +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"','"+pension+"','"+security+"')";
+                            +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
+                            +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"','"+pension+"','"+security+"')";
                 }
             }
             else
             {
                 return "insert into record (datetime_input,rut_people,rut_user,type,state,comment,patent_input,patent_output) values ('"
-                            +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
-                            +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"')";
+                        +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
+                        +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"')";
             }
         }
     }
@@ -397,6 +397,7 @@ void ReadWithoutCI::on_pushButton_register_clicked()
         {
             if(inputCurrentIndex < 0)
             {
+
                 QMessageBox::warning(this,tr("Advertencia"),tr("Este usuario contiene registros de entrada sin salida, favor registrar salida manual antes de continuar."));
                 ui->listView_imput->setFocus();
                 Logger::insert2Logger(rutSignin," ERROR ", "Se ha intentado registrar entrada del usuario " +ui->lineEdit_rut->text()+" que contiene ingresos previos.");
@@ -404,16 +405,16 @@ void ReadWithoutCI::on_pushButton_register_clicked()
             else{
                 if(ui->lineEdit_comment->text().isEmpty())
                     qry->prepare("update record set state='C',datetime_output='"+currentDateTime.toString("yyyy-MM-dd HH:mm")+"',patent_output='"+
-                            ui->lineEdit_patent_output->text()+"' where datetime_input='"+
-                            ui->listView_imput->currentIndex().data().toString()+"' and rut_people='"+ui->lineEdit_rut->text()+"'");
+                                 ui->lineEdit_patent_output->text()+"' where datetime_input='"+
+                                 ui->listView_imput->currentIndex().data().toString()+"' and rut_people='"+ui->lineEdit_rut->text()+"'");
                 else
                     qry->prepare("update record set state='C',datetime_output='"+currentDateTime.toString("yyyy-MM-dd HH:mm")+"',patent_output='"+
-                            ui->lineEdit_patent_output->text()+"',comment=comment ||', "+ui->lineEdit_comment->text()+"' where datetime_input='"+
-                            ui->listView_imput->currentIndex().data().toString()+"' and rut_people='"+ui->lineEdit_rut->text()+"'");
+                                 ui->lineEdit_patent_output->text()+"',comment=comment ||', "+ui->lineEdit_comment->text()+"' where datetime_input='"+
+                                 ui->listView_imput->currentIndex().data().toString()+"' and rut_people='"+ui->lineEdit_rut->text()+"'");
             }
         }
         else
-            qry->prepare(verifyPeople());
+                qry->prepare(verifyPeople());
         if(qry->exec())
         {
             Logger::insert2Logger(rutSignin, " DEBUG ", ui->lineEdit_rut->text() + " -> " + qry->lastQuery());
@@ -427,6 +428,7 @@ void ReadWithoutCI::on_pushButton_register_clicked()
             Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());
         }
         delete qry;
+
     }
     else
     {

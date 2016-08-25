@@ -809,7 +809,6 @@
     <addaction name="actionCerrar_Sesi_n"/>
     <addaction name="actionSalir"/>
     <addaction name="separator"/>
-    <addaction name="actionAdministrar_2"/>
    </widget>
    <widget class="QMenu" name="menuHerramientas">
     <property name="title">
@@ -818,6 +817,7 @@
     <addaction name="actionConfiguraci_n"/>
     <addaction name="actionDetectar_ComboScan"/>
     <addaction name="actionDetectar_RTScan"/>
+    <addaction name="actionAdministrar_2"/>
    </widget>
    <widget class="QMenu" name="menuEventos">
     <property name="title">
@@ -1039,7 +1039,7 @@
   </action>
   <action name="actionAdministrar_2">
    <property name="text">
-    <string>Administrar</string>
+    <string>Mantenimiento</string>
    </property>
   </action>
  </widget>

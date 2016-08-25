@@ -16,7 +16,7 @@ administratorMenu::administratorMenu(QWidget *parent) :
     QPixmap greenIcon(":images/ok.png");
     QPixmap redIcon(":images/bad.png");
     ui->setupUi(this);
-    this->setWindowTitle("Control de Accesos - Menu Administracion");
+    this->setWindowTitle("Control de Accesos - Menu Mantenimiento");
     ui->label_Administrator->setPixmap(redIcon);
     ui->label_labelExecution->setPixmap(redIcon);
     ui->lineEdit->setFocus();

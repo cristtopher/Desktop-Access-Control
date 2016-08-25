@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>783</width>
+   <width>743</width>
     <height>448</height>
    </rect>
   </property>
@@ -25,7 +25,7 @@
    <property name="title">
     <string>Datos</string>
    </property>
-   <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -47,7 +47,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -74,37 +74,70 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>20</y>
-     <width>541</width>
-     <height>411</height>
+     <y>60</y>
+     <width>491</width>
+     <height>371</height>
     </rect>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>200</y>
-     <width>158</width>
+     <width>201</width>
      <height>25</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="pushButton_newCompany">
       <property name="text">
-       <string>Agregar</string>
+       <string>Nuevo</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="pushButton_update">
       <property name="text">
        <string>Actualizar</string>
       </property>
      </widget>
     </item>
    </layout>
+  </widget>
+<widget class="QComboBox" name="comboBox_search">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>20</y>
+     <width>91</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_search">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>20</y>
+     <width>371</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_new">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>230</y>
+     <width>201</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Agregar</string>
+   </property>
   </widget>
  </widget>
  <resources/>
