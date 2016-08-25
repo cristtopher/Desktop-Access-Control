@@ -808,6 +808,7 @@
     <addaction name="separator"/>
     <addaction name="actionCerrar_Sesi_n"/>
     <addaction name="actionSalir"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHerramientas">
     <property name="title">
@@ -816,6 +817,7 @@
     <addaction name="actionConfiguraci_n"/>
     <addaction name="actionDetectar_ComboScan"/>
     <addaction name="actionDetectar_RTScan"/>
+    <addaction name="actionAdministrar_2"/>
    </widget>
    <widget class="QMenu" name="menuEventos">
     <property name="title">
@@ -1033,6 +1035,11 @@
  <action name="actionEnrolar">
    <property name="text">
     <string>Enrolar</string>
+   </property>
+  </action>
+<action name="actionAdministrar_2">
+   <property name="text">
+    <string>Mantenimiento</string>
    </property>
   </action>
  </widget>

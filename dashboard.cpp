@@ -29,6 +29,7 @@
 #include "dailyreport.h"
 #include "formcs.h"
 #include <login.h>
+#include <administratormenu.h>
 
 #include <QtCore>
 #include "xlsxdocument.h"
@@ -80,6 +81,7 @@ QString PERSONAL_DATA;
 QString GIVENNAME;
 QString MATERNAL_SUR;
 QString PATERNAL_SUR;
+QString codeAdministration;
 
 
 PassportReader pr;  /* Object for the PR system */
@@ -2072,4 +2074,10 @@ void Dashboard::on_actionEnrolar_triggered()
 {
  QCoreApplication::quit();
 }*/
-
+void Dashboard::on_actionAdministrar_2_triggered()
+{
+    disconnect(RTScan, SIGNAL(readyRead()),this,SLOT(serialReceived()));
+    administratorMenu admin(this);
+    admin.exec();
+    connect(RTScan, SIGNAL(readyRead()),this,SLOT(serialReceived()));
+}
