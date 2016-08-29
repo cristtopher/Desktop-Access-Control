@@ -17,8 +17,8 @@ People::People(QWidget *parent) :
     this->setWindowTitle("Control de accesos - Administrador de personas");
     ui->pushButton_new->setEnabled(false);
 
-       connection conn;
-       /*
+    connection conn;
+    /*
     if(conn.isOpenDB()==true){
         QMessageBox::critical(this,tr("ERROR"),tr("Error al establecer conexion con base de datos"));
         QPixmap db_bad(":images/Database-Delete-icon.png");
@@ -26,71 +26,71 @@ People::People(QWidget *parent) :
     }
     else
     {*/
-        QPixmap db_ok(":images/Database-Accept-icon.png");
-        ui->label_status->setPixmap(db_ok);
-        ui->lineEdit_rut->setFocus();
+    QPixmap db_ok(":images/Database-Accept-icon.png");
+    ui->label_status->setPixmap(db_ok);
+    ui->lineEdit_rut->setFocus();
 
-        QSqlQueryModel * nacionalityModal=new QSqlQueryModel();
-        QSqlQuery* qry=new QSqlQuery(conn.mydb);
-        qry->exec("select name from nationality order by name asc");
-        nacionalityModal->setQuery(*qry);
-        ui->comboBox_nationality->setModel(nacionalityModal);
-        ui->comboBox_nationality->setCurrentIndex(ui->comboBox_nationality->findText("Chile"));
+    QSqlQueryModel * nacionalityModal=new QSqlQueryModel();
+    QSqlQuery* qry=new QSqlQuery(conn.mydb);
+    qry->exec("select name from nationality order by name asc");
+    nacionalityModal->setQuery(*qry);
+    ui->comboBox_nationality->setModel(nacionalityModal);
+    ui->comboBox_nationality->setCurrentIndex(ui->comboBox_nationality->findText("Chile"));
 
-        QSqlQueryModel * profileModal=new QSqlQueryModel();
-        qry->exec("select name from profile order by name asc");
+    QSqlQueryModel * profileModal=new QSqlQueryModel();
+    qry->exec("select name from profile order by name asc");
 
-        profileModal->setQuery(*qry);
-        ui->comboBox_profile->setModel(profileModal);
-        ui->comboBox_profile->setCurrentIndex(-1);
+    profileModal->setQuery(*qry);
+    ui->comboBox_profile->setModel(profileModal);
+    ui->comboBox_profile->setCurrentIndex(-1);
 
-        QSqlQueryModel * positionModal=new QSqlQueryModel();
-        qry->exec("select name from position order by name asc");
-        positionModal->setQuery(*qry);
-        ui->comboBox_position->setModel(positionModal);
-        ui->comboBox_position->setCurrentIndex(-1);
+    QSqlQueryModel * positionModal=new QSqlQueryModel();
+    qry->exec("select name from position order by name asc");
+    positionModal->setQuery(*qry);
+    ui->comboBox_position->setModel(positionModal);
+    ui->comboBox_position->setCurrentIndex(-1);
 
-        QSqlQueryModel * companyModal=new QSqlQueryModel();
-//        qry->prepare("select name || ' (' || rut || ')' from company order by name asc");
-        qry->exec("select name from company order by name asc");
-        companyModal->setQuery(*qry);
-        ui->comboBox_company->setModel(companyModal);
-        ui->comboBox_company->setCurrentIndex(-1);
+    QSqlQueryModel * companyModal=new QSqlQueryModel();
+    //        qry->prepare("select name || ' (' || rut || ')' from company order by name asc");
+    qry->exec("select name from company order by name asc");
+    companyModal->setQuery(*qry);
+    ui->comboBox_company->setModel(companyModal);
+    ui->comboBox_company->setCurrentIndex(-1);
 
-        QCompleter *completer = new QCompleter(this);
-        completer->setModel(companyModal);
-        ui->comboBox_company->setCompleter(completer);
+    QCompleter *completer = new QCompleter(this);
+    completer->setModel(companyModal);
+    ui->comboBox_company->setCompleter(completer);
 
-        QSqlQueryModel * frequencyModal=new QSqlQueryModel();
-        qry->exec("select name from frequency order by name asc");
-        frequencyModal->setQuery(*qry);
-        ui->comboBox_frequency->setModel(frequencyModal);
-        ui->comboBox_frequency->setCurrentIndex(ui->comboBox_frequency->findText("TEMPORAL"));
+    QSqlQueryModel * frequencyModal=new QSqlQueryModel();
+    qry->exec("select name from frequency order by name asc");
+    frequencyModal->setQuery(*qry);
+    ui->comboBox_frequency->setModel(frequencyModal);
+    ui->comboBox_frequency->setCurrentIndex(ui->comboBox_frequency->findText("TEMPORAL"));
 
-        ui->comboBox_state->addItem("ACTIVO", "A");
-        ui->comboBox_state->addItem("INACTIVO","I");
+    ui->comboBox_state->addItem("ACTIVO", "A");
+    ui->comboBox_state->addItem("INACTIVO","I");
 
-        ui->dateEdit_start->setDate(QDate::currentDate());
-        ui->dateEdit_end->setDate(QDate::currentDate().addDays(1));
+    ui->dateEdit_start->setDate(QDate::currentDate());
+    ui->dateEdit_end->setDate(QDate::currentDate().addDays(1));
 
-        ui->timeEdit_start->setTime(QTime::fromString("08:00"));
-        ui->timeEdit_end->setTime(QTime::fromString("18:00"));
+    ui->timeEdit_start->setTime(QTime::fromString("08:00"));
+    ui->timeEdit_end->setTime(QTime::fromString("18:00"));
 
-        ui->pushButton_update->setEnabled(false);
+    ui->pushButton_update->setEnabled(false);
 
-        //loading record head for filtered by combobox
-        ui->comboBox_filtered->addItem("Rut","rut");
-        ui->comboBox_filtered->addItem("Nombres","names");
-        ui->comboBox_filtered->addItem("Apellido Paterno","paternal_surname");
-        ui->comboBox_filtered->addItem("Apellido Materno","maternal_surname");
-        ui->comboBox_filtered->addItem("Estado","state");
-        ui->comboBox_filtered->addItem("Empresa","empresa");
+    //loading record head for filtered by combobox
+    ui->comboBox_filtered->addItem("Rut","rut");
+    ui->comboBox_filtered->addItem("Nombres","names");
+    ui->comboBox_filtered->addItem("Apellido Paterno","paternal_surname");
+    ui->comboBox_filtered->addItem("Apellido Materno","maternal_surname");
+    ui->comboBox_filtered->addItem("Estado","state");
+    ui->comboBox_filtered->addItem("Empresa","empresa");
 
-        //para obtener index seleccionado
-        //QString state =  ui->comboBox_state->itemText(ui->comboBox_state->currentIndex());
+    //para obtener index seleccionado
+    //QString state =  ui->comboBox_state->itemText(ui->comboBox_state->currentIndex());
 
-        loadTable("default");
-    }
+    loadTable("default");
+}
 //}
 
 People::~People()
@@ -102,7 +102,7 @@ void People::loadTable(QString query){
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
     if(query=="default")
-       // qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
+        // qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
         qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as Apellido_Paterno,p.maternal_surname as Apellido_Materno,c.name as Empresa,(CASE WHEN p.state = 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
     else
         qry->prepare(query);
@@ -145,18 +145,18 @@ void People::on_lineEdit_maternal_surname_editingFinished()
 
 void People::on_lineEdit_email_editingFinished()
 {
-//    if(ui->lineEdit_email->text().isEmpty())
-//    {
-//        ui->lineEdit_email->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
-//        ui->lineEdit_email->setFocus();
-//    }
-//    else if(!ui->lineEdit_email->text().contains("@") || !ui->lineEdit_email->text().contains("."))
-//    {
-//        ui->lineEdit_email->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
-//        ui->lineEdit_email->setFocus();
-//    }
-//    else
-//        ui->lineEdit_email->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
+    //    if(ui->lineEdit_email->text().isEmpty())
+    //    {
+    //        ui->lineEdit_email->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
+    //        ui->lineEdit_email->setFocus();
+    //    }
+    //    else if(!ui->lineEdit_email->text().contains("@") || !ui->lineEdit_email->text().contains("."))
+    //    {
+    //        ui->lineEdit_email->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //        ui->lineEdit_email->setFocus();
+    //    }
+    //    else
+    //        ui->lineEdit_email->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
     ui->lineEdit_email->setText(ui->lineEdit_email->text().toUpper());
 }
 
@@ -168,48 +168,48 @@ void People::on_dateEdit_end_editingFinished()
 bool People::validateChnId(QString rut)
 {
     //vectorizar rut
-//    QVector<QString> vrut(rut.length());
-//    int i;
-//    //invertimos
-//    for(i = rut.length(); i >= 0 ; i--) {
-//        vrut.append(rut.at(i));
-//        qDebug()<<rut.at(i);
-//    }
-//    for(i = 0; i <= vrut.size(); i++) {
-//        qDebug()<<vrut.at(i);
-//    }
-//    int s;
-//    int c=2;
-//    for(i=0; i <= vrut.size(); i++){
-//        s=s+(vrut.at(i).toInt() * c);
-//        c++;
-//    }
-//    qDebug()<<c;
-//    int Ri = c%11;
-//    int Rf = 11-Ri;
-//    QString dv;
-//    if(Rf==11){
-//        dv="0";
-//    }else if(Rf==10){
-//        dv="K";
-//    }else if(Rf<10){
-//        dv=Rf;
-//    }
+    //    QVector<QString> vrut(rut.length());
+    //    int i;
+    //    //invertimos
+    //    for(i = rut.length(); i >= 0 ; i--) {
+    //        vrut.append(rut.at(i));
+    //        qDebug()<<rut.at(i);
+    //    }
+    //    for(i = 0; i <= vrut.size(); i++) {
+    //        qDebug()<<vrut.at(i);
+    //    }
+    //    int s;
+    //    int c=2;
+    //    for(i=0; i <= vrut.size(); i++){
+    //        s=s+(vrut.at(i).toInt() * c);
+    //        c++;
+    //    }
+    //    qDebug()<<c;
+    //    int Ri = c%11;
+    //    int Rf = 11-Ri;
+    //    QString dv;
+    //    if(Rf==11){
+    //        dv="0";
+    //    }else if(Rf==10){
+    //        dv="K";
+    //    }else if(Rf<10){
+    //        dv=Rf;
+    //    }
 
-//    qDebug()<<dv;
-//    if(vrut.at(rut.length())==dv){
-//        return true;
-//    }else{
-//        return false;
-//    }
+    //    qDebug()<<dv;
+    //    if(vrut.at(rut.length())==dv){
+    //        return true;
+    //    }else{
+    //        return false;
+    //    }
     return true;
 }
 void People::on_lineEdit_names_textChanged()
 {
-//    if(ui->lineEdit_rut->text().isEmpty())
-//        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
-//    if(ui->lineEdit_names->styleSheet().contains("QLineEdit { background: rgb(255, 121, 121);}"))
-//        ui->lineEdit_names->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
+    //    if(ui->lineEdit_rut->text().isEmpty())
+    //        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_names->styleSheet().contains("QLineEdit { background: rgb(255, 121, 121);}"))
+    //        ui->lineEdit_names->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
     ui->lineEdit_names->setText(ui->lineEdit_names->text().toUpper());
 }
 
@@ -222,40 +222,40 @@ void People::on_lineEdit_rut_textChanged()
     rut.remove(QRegularExpression("[A-J]"));
     rut.remove(QRegularExpression("[L-Z]"));
     ui->lineEdit_rut->setText(rut);
-//    if(ui->lineEdit_rut->styleSheet().contains("QLineEdit { background: rgb(255, 121, 121);}"))
-//        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
+    //    if(ui->lineEdit_rut->styleSheet().contains("QLineEdit { background: rgb(255, 121, 121);}"))
+    //        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
 }
 
 void People::on_lineEdit_paternal_surname_textChanged()
 {
-//    if(ui->lineEdit_rut->text().isEmpty())
-//        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
-//    if(ui->lineEdit_names->text().isEmpty())
-//        ui->lineEdit_names->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_rut->text().isEmpty())
+    //        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_names->text().isEmpty())
+    //        ui->lineEdit_names->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
     ui->lineEdit_paternal_surname->setText(ui->lineEdit_paternal_surname->text().toUpper());
 }
 
 void People::on_lineEdit_maternal_surname_textChanged()
 {
-//    if(ui->lineEdit_rut->text().isEmpty())
-//        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
-//    if(ui->lineEdit_names->text().isEmpty())
-//        ui->lineEdit_names->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
-//    if(ui->lineEdit_paternal_surname->text().isEmpty())
-//        ui->lineEdit_paternal_surname->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_rut->text().isEmpty())
+    //        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_names->text().isEmpty())
+    //        ui->lineEdit_names->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_paternal_surname->text().isEmpty())
+    //        ui->lineEdit_paternal_surname->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
     ui->lineEdit_maternal_surname->setText(ui->lineEdit_maternal_surname->text().toUpper());
 }
 
 void People::on_dateEdit_birthdate_userDateChanged()
 {
-//    if(ui->lineEdit_rut->text().isEmpty())
-//        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
-//    if(ui->lineEdit_names->text().isEmpty())
-//        ui->lineEdit_names->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
-//    if(ui->lineEdit_paternal_surname->text().isEmpty())
-//        ui->lineEdit_paternal_surname->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
-//    if(ui->lineEdit_maternal_surname->text().isEmpty())
-//        ui->lineEdit_maternal_surname->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_rut->text().isEmpty())
+    //        ui->lineEdit_rut->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_names->text().isEmpty())
+    //        ui->lineEdit_names->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_paternal_surname->text().isEmpty())
+    //        ui->lineEdit_paternal_surname->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
+    //    if(ui->lineEdit_maternal_surname->text().isEmpty())
+    //        ui->lineEdit_maternal_surname->setStyleSheet("QLineEdit { background: rgb(255, 121, 121);}");
 }
 
 void People::on_comboBox_frequency_currentIndexChanged(int index)
@@ -412,24 +412,30 @@ void People::on_pushButton_update_clicked()
     QString cellphone = ui->lineEdit_cellphone->text();
     QString email = ui->lineEdit_email->text();
 
-    if(!qry->exec("UPDATE people SET names='"+ui->lineEdit_names->text()+
-                 "',paternal_surname='"+ui->lineEdit_paternal_surname->text()+"',maternal_surname='"+ui->lineEdit_maternal_surname->text()+
-                 "',birthdate='"+ui->dateEdit_birthdate->text()+"',email='"+email+"',cellphone='"+
-                 cellphone+"',start_authorized_hour='"+ui->timeEdit_start->text()+"',end_authorized_hour='"+
-                 ui->timeEdit_end->text()+"',state='"+state+"',start_authorized_date='"+ui->dateEdit_start->text()+"',end_authorized_date='"+ui->dateEdit_end->text()+
-                 "',code_nationality='"+nationality+"',id_position='"+position+"',id_profile='"+profile+"',id_frequency='"+frequency+"',rut_company='"+company+"'"+
-                 " where rut='"+ui->lineEdit_rut->text()+"'"))
-    {
-        QMessageBox::critical(this,tr("Error al registrar"),error1);
-        Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());
-    }
-    else
-    {
-        QMessageBox::information(this,"ACTUALIZACION", tr("Persona actualizada exitosamente."));
-        Logger::insert2Logger(rutSignin, " DEBUG ", qry->lastQuery());
-        ui->dateEdit_start->setDate(QDate::fromString(conn.getFirstFromDb(rutSignin,"select start_authorized_date from people where rut = '"+ui->lineEdit_rut->text()+"'")));
-        ui->dateEdit_end->setDate(QDate::fromString(conn.getFirstFromDb(rutSignin,"select end_authorized_date from people where rut = '"+ui->lineEdit_rut->text()+"'")));
-    }
+    if(!ui->lineEdit_rut->text().isEmpty()){
+
+        if(!qry->exec("UPDATE people SET names='"+ui->lineEdit_names->text()+
+                      "',paternal_surname='"+ui->lineEdit_paternal_surname->text()+"',maternal_surname='"+ui->lineEdit_maternal_surname->text()+
+                      "',birthdate='"+ui->dateEdit_birthdate->text()+"',email='"+email+"',cellphone='"+
+                      cellphone+"',start_authorized_hour='"+ui->timeEdit_start->text()+"',end_authorized_hour='"+
+                      ui->timeEdit_end->text()+"',state='"+state+"',start_authorized_date='"+ui->dateEdit_start->text()+"',end_authorized_date='"+ui->dateEdit_end->text()+
+                      "',code_nationality='"+nationality+"',id_position='"+position+"',id_profile='"+profile+"',id_frequency='"+frequency+"',rut_company='"+company+"'"+
+                      " where rut='"+ui->lineEdit_rut->text()+"'"))
+        {
+            QMessageBox::critical(this,tr("Error al registrar"),error1);
+            Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());
+        }
+        else
+        {
+            QMessageBox::information(this,"ACTUALIZACION", tr("Persona actualizada exitosamente."));
+            Logger::insert2Logger(rutSignin, " DEBUG ", qry->lastQuery());
+            ui->dateEdit_start->setDate(QDate::fromString(conn.getFirstFromDb(rutSignin,"select start_authorized_date from people where rut = '"+ui->lineEdit_rut->text()+"'")));
+            ui->dateEdit_end->setDate(QDate::fromString(conn.getFirstFromDb(rutSignin,"select end_authorized_date from people where rut = '"+ui->lineEdit_rut->text()+"'")));
+        }
+    }else
+        QMessageBox::information(this,"PRECAUCION", tr("Campo RUT vacio,porfavor Verifique"));
+
+
     delete qry;
     loadTable("default");
 }
@@ -464,10 +470,10 @@ void People::on_pushButton_add_clicked()
                             QString id_frequency = conn.getFirstFromDb(rutSignin,"select id from frequency where name='"+ ui->comboBox_frequency->itemText(ui->comboBox_frequency->currentIndex())+"'");
                             QString state = ui->comboBox_state->itemData(ui->comboBox_state->currentIndex()).toString();
 
-    //                        if(id_position.isEmpty())
-    //                            id_position=" ";
-    //                        if(id_profile.isEmpty())
-    //                            id_profile=" ";
+                            //                        if(id_position.isEmpty())
+                            //                            id_position=" ";
+                            //                        if(id_profile.isEmpty())
+                            //                            id_profile=" ";
 
                             if(rut_company.isEmpty())
                                 QMessageBox::critical(this,tr("ERROR"),tr("Debe seleccionar empresa primero."));
@@ -475,26 +481,26 @@ void People::on_pushButton_add_clicked()
                             {
                                 QString query;
                                 if(ui->comboBox_frequency->itemText(ui->comboBox_frequency->currentIndex())=="PERMANENTE"){
-                                   query=tr("insert into people (rut, names, paternal_surname, maternal_surname, birthdate, rut_company, state, code_nationality, ")
-                                        + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
-                                        +"id_profile, id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"
-                                        +ui->lineEdit_maternal_surname->text()+"','"+ui->dateEdit_birthdate->text()+"','"
-                                        +rut_company+"','"+state+"','"+id_nationality+"','"+ui->timeEdit_start->text()+"','"+ui->timeEdit_end->text()+"','"+ui->dateEdit_start->text()+"','""','"
-                                        +ui->lineEdit_cellphone->text()+"','"+ui->lineEdit_email->text()+"','"+id_position+"','"+id_profile+"','"+id_frequency+"')";
+                                    query=tr("insert into people (rut, names, paternal_surname, maternal_surname, birthdate, rut_company, state, code_nationality, ")
+                                            + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
+                                            +"id_profile, id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"
+                                            +ui->lineEdit_maternal_surname->text()+"','"+ui->dateEdit_birthdate->text()+"','"
+                                            +rut_company+"','"+state+"','"+id_nationality+"','"+ui->timeEdit_start->text()+"','"+ui->timeEdit_end->text()+"','"+ui->dateEdit_start->text()+"','""','"
+                                            +ui->lineEdit_cellphone->text()+"','"+ui->lineEdit_email->text()+"','"+id_position+"','"+id_profile+"','"+id_frequency+"')";
 
-                                   /* query=tr("insert into people (rut, names, paternal_surname,birthdate, rut_company, state, code_nationality,")
+                                    /* query=tr("insert into people (rut, names, paternal_surname,birthdate, rut_company, state, code_nationality,")
                                                                            + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
                                                                            +"id_profile,picture,maternal_surname,id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"
                                                                            +ui->dateEdit_birthdate->text()+"','"+rut_company+"','"
                                                                            +state+"','"+id_nationality+"','"+ui->timeEdit_start->text()+"','"+ui->timeEdit_end->text()+"','"+ui->dateEdit_start->text()+"','"+' '+"','"
                                                                            +ui->lineEdit_cellphone->+"','"+ui->lineEdit_email->text()+"','"+id_position+"','"+id_profile+"','"+' '+"','"+ui->lineEdit_maternal_surname->text()+"','"+id_frequency+"')";*/
-                                }else                               
+                                }else
                                     query=tr("insert into people (rut, names, paternal_surname, maternal_surname, birthdate, rut_company, state, code_nationality, ")
-                                        + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
-                                        +"id_profile, id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"
-                                        +ui->lineEdit_maternal_surname->text()+"','"+ui->dateEdit_birthdate->text()+"','"
-                                        +rut_company+"','"+state+"','"+id_nationality+"','"+ui->timeEdit_start->text()+"','"+ui->timeEdit_end->text()+"','"+ui->dateEdit_start->text()+"','"
-                                        +ui->dateEdit_end->text()+"','"+ui->lineEdit_cellphone->text()+"','"+ui->lineEdit_email->text()+"','"+id_position+"','"+id_profile+"','"+id_frequency+"')";
+                                            + tr("start_authorized_hour, end_authorized_hour,start_authorized_date, end_authorized_date, cellphone, email, id_position, ")
+                                            +"id_profile, id_frequency) values ('"+ui->lineEdit_rut->text()+"','"+ui->lineEdit_names->text()+"','"+ui->lineEdit_paternal_surname->text()+"','"
+                                            +ui->lineEdit_maternal_surname->text()+"','"+ui->dateEdit_birthdate->text()+"','"
+                                            +rut_company+"','"+state+"','"+id_nationality+"','"+ui->timeEdit_start->text()+"','"+ui->timeEdit_end->text()+"','"+ui->dateEdit_start->text()+"','"
+                                            +ui->dateEdit_end->text()+"','"+ui->lineEdit_cellphone->text()+"','"+ui->lineEdit_email->text()+"','"+id_position+"','"+id_profile+"','"+id_frequency+"')";
 
                                 if(connection::insert2Db(rutSignin,query)){
                                     QMessageBox::information(this,tr("INFO"),tr("Persona agregada exitosamente."));

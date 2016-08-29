@@ -36,6 +36,8 @@ private slots:
 
     QString verifyPeople();
 
+    void on_lineEdit_patent_input_textChanged(const QString &arg1);
+
 private:
     Ui::ReadWithoutCI *ui;
 };

@@ -43,6 +43,8 @@
 #include "include/gxsdldr.cpp"
 #include "__lib__.h"
 
+#include <iomanip>
+
 #include <QProgressDialog>
 #include <QtWidgets/QApplication>
 
@@ -207,6 +209,10 @@ Dashboard::Dashboard(QWidget *parent) :
         ui->label_status_lect->setPixmap(badPix);
         Logger::insert2Logger(rutSignin," ERROR ", "RTScan desconectado.");
     }
+    // QString imgPath = QDir::currentPath()+"/people/" + rut + ".jpg";
+    if(!QDir("people").exists())
+        QDir().mkdir("people");
+
 }
 
 void Dashboard::loopComboScan(){
@@ -1149,7 +1155,6 @@ bool Dashboard::readAnverso(QString rut)
         lib.FunctionStart("Connecting to the first device");
         pr.UseDevice(0,PR_UMODE_FULL_CONTROL);
         lib.FunctionEnd();
-
         if (!pr.IsValid())
         {
             lib.Error("Failed to initialize!");
@@ -1247,7 +1252,7 @@ bool Dashboard::connectComboScan()
     }
     catch(gxException e) // e.GetErrorString()
     {
-        QMessageBox::critical(this,tr("ERROR"),tr("Comboscan no conectado, conecte y detecte desde menu herramientas."));
+        QMessageBox::warning(this,tr("ERROR"),tr("Comboscan no conectado, conecte y detecte desde menu herramientas."));
         statusBar()->showMessage("ComboScan no conectado...",5000);
         Logger::insert2Logger(rutSignin," ERROR ", QString::number(e.GetErrorCode()));
         return false;
@@ -1257,6 +1262,9 @@ bool Dashboard::connectComboScan()
 void Dashboard::on_pushButton_clicked()
 {
     readFromPR();
+    if(comboScanIsOpen()==false){
+        QMessageBox::warning(this,tr("PRECAUCION"),tr("Comboscan no conectado, conecte y detecte desde menu herramientas."));
+    }
     ui->lineEdit_pdf417->setFocus();
 }
 
@@ -1356,7 +1364,7 @@ void Dashboard::on_tableWidget_input_cellChanged(int row, int column)
 
 void Dashboard::on_actionDetectar_ComboScan_triggered()
 {
-    if(connectComboScan())
+    if(comboScanIsOpen()==true)
     {
         QPixmap okPix(":/images/ok.png");
         ui->label_status_cs->setPixmap(okPix);
@@ -2004,6 +2012,7 @@ void Dashboard::on_lineEdit_pdf417_textChanged(const QString &arg1)
 void Dashboard::on_actionDetectar_RTScan_triggered()
 {
     if(RTScan->isOpen()){
+        //qDebug()<<RTScan->portName();
         connection conn;
         //        foreach (const QSerialPortInfo &Ports, QSerialPortInfo::availablePorts())
         //            ui->comboBox_rtscan->addItem(Ports.portName());
@@ -2049,6 +2058,8 @@ void Dashboard::on_pushButton_updatePic_clicked()
             user.load(pic.fileName());
             ui->label_user->setPixmap(user);
         }
+        if(!pic.exists())
+            QMessageBox::information(this,tr("INFORMACION"),"Persona sin foto, porfavor verifique la posicion del carnet");
     }
 }
 

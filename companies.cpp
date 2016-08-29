@@ -9,7 +9,7 @@ Companies::Companies(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Control de accesos - Administrador de empresas");
     ui->comboBox_search->addItem("Rut","rut");
-    ui->comboBox_search->addItem("Nombres","names");
+    ui->comboBox_search->addItem("Razon Social","names");
     ui->lineEdit_rut->setEnabled(false);
     ui->pushButton_new->setEnabled(false);
     loadTable("default");

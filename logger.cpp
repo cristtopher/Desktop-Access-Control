@@ -13,7 +13,7 @@ Logger::Logger(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QFile file("./comboscan.log");
+    QFile file("./AccessControl.log");
     if(file.open(QFile::ReadOnly|QFile::Truncate)){
         QTextStream in(&file);
         QString text = in.readAll();
@@ -28,7 +28,7 @@ Logger::Logger(QWidget *parent) :
 
 void Logger::insert2Logger(const QString rut_user, const QString level, const QString event)
 {
-    QFile fileName("comboscan.log");
+    QFile fileName("AccessControl.log");
     if(fileName.open(QIODevice::WriteOnly | QIODevice::Append))
     {
         QTextStream textStream(&fileName);
