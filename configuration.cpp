@@ -54,6 +54,7 @@ Configuration::Configuration(QWidget *parent) :
 
     // RTScan
     foreach (const QSerialPortInfo &Ports, QSerialPortInfo::availablePorts())
+
         ui->comboBox_rtscan->addItem(Ports.portName());
     rtPort = ui->comboBox_rtscan->currentText();
 }

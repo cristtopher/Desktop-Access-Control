@@ -686,15 +686,16 @@ void Dashboard::handlePeople(QString device){
         //Autorizher
         QStringList authorizer;
         QSqlQuery* qury=new QSqlQuery(conn.mydb);
-        qury->prepare("select names from users where id_rol=2");
+        qury->prepare("select names,paternal_surname from users where id_rol=2");
         if(!qury->exec())
         {
             QMessageBox::critical(this,tr("ERROR"),error1);
             Logger::insert2Logger(rutSignin," ERROR ",error1);
         }
         else
-            while(qury->next())
-                authorizer << qury->value(0).toString();
+            while(qury->next()){
+                authorizer << qury->value(0).toString()+" "+qury->value(1).toString();
+            }
         delete qury;
 
         //input or output?
@@ -762,7 +763,7 @@ void Dashboard::handlePeople(QString device){
                         while(ok && authorizedBy.isEmpty());
                         if (ok)
                         {
-                            authorizedBy = "[OUT OF TIME RANGE] " + authorizedBy;
+                            authorizedBy = "[OUT OF TIME RANGE]: " + authorizedBy;
                             Logger::insert2Logger(rutSignin," DEBUG ", global_PERSONAL_DATA +" accedió en horario no autorizado ("+currentDate.toString("yyyy-MM-dd")+currentTime.toString("HH:mm")+"), fué autorizado por "+authorizedBy);
                             recordState = "O";
                         }
@@ -813,7 +814,7 @@ void Dashboard::handlePeople(QString device){
                         while(ok && authorizedBy.isEmpty());
                         if (ok)
                         {
-                            authorizedBy = "[OUT OF TIME RANGE] " + authorizedBy;
+                            authorizedBy = "[OUT OF TIME RANGE]: " + authorizedBy;
                             Logger::insert2Logger(rutSignin," DEBUG ", global_PERSONAL_DATA +" accedió en horario no autorizado ("+currentDate.toString("yyyy-MM-dd")+currentTime.toString("HH:mm")+"), fué autorizado por "+authorizedBy);
                             recordState = "O";
                         }
@@ -837,7 +838,7 @@ void Dashboard::handlePeople(QString device){
                 while(ok && authorizedBy.isEmpty());
                 if (ok)
                 {
-                    authorizedBy = "[OUT OF TIME RANGE] " + authorizedBy;
+                    authorizedBy = "[OUT OF TIME RANGE]: " + authorizedBy;
                     Logger::insert2Logger(rutSignin," DEBUG ", global_PERSONAL_DATA +" accedió en horario no autorizado ("+currentDate.toString("yyyy-MM-dd")+currentTime.toString("HH:mm")+"), fué autorizado por "+authorizedBy);
                     recordState = "O";
                 }
@@ -849,91 +850,12 @@ void Dashboard::handlePeople(QString device){
                 }
                 query="insert into record (datetime_input,rut_people,rut_user,type,state,authorized_by) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','"+authorizedBy+"')";
             }
-            if(global_PROFILE.contains("CONTRATISTA") && flag_for_rejected == false)
-            {
-                QStringList items;
-                QString item;
-                items << tr("[1] Solo obligaciones previcionales") << tr("[2] Solo elementos de seguridad") << tr("Ambos") << tr("Ninguno");
-
-                do
-                    item = QInputDialog::getItem(this, tr("Obligaciones"),tr("¿Cuenta con requerimeintos obligatotios?"), items,0,false,&ok);
-                while(item.isEmpty());
-
-                if (ok)
-                {
-                    if(item.contains("Ninguno"))
-                    {
-                        qApp->beep();
-                        do
-                            authorizedBy = QInputDialog::getItem(this, tr("Ingreso Rechazado."),tr("Acceso no autorizado por incumplimiento de obligaciones, solicite autorizacion e indique quien autoriza:"),authorizer,0,false,&ok);
-                        while(ok && authorizedBy.isEmpty());
-                        if(ok && !authorizedBy.isEmpty())
-                        {
-                            authorizedBy = "[DOES NOT MEET REQUIREMENTS] " + authorizedBy;
-                            recordState = "O";
-                        }
-                        else
-                        {
-                            Logger::insert2Logger(rutSignin," DEBUG ", "Acceso de "+global_PERSONAL_DATA+" rechazada por no cumplir requerimientos para CONTRATISTAS.");
-                            recordState = "RMR";
-                        }
-                        query="insert into record (datetime_input,rut_people,rut_user,type,state,authorized_by,pension_quotes,security_elements) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','"+authorizedBy+"','false','false')";
-                    }
-                    else if(item.contains("[2]"))
-                    {
-                        qApp->beep();
-                        do
-                            authorizedBy = QInputDialog::getItem(this, tr("Ingreso Rechazado."),tr("Acceso no autorizado, requiere certificado de obligaciones previsionales.\n\n Solicite autorización e indique quien autoriza:"),authorizer,0,false,&ok);
-                        while(ok && authorizedBy.isEmpty());
-                        if(ok && !authorizedBy.isEmpty())
-                        {
-                            authorizedBy = "[DOES NOT MEET QUOTE REQUIREMENTS] " + authorizedBy;
-                            recordState = "O";
-                        }
-                        else
-                        {
-                            Logger::insert2Logger(rutSignin," DEBUG ", "Acceso de "+global_PERSONAL_DATA+" rechazada por no cumplir requerimientos previsionales para CONTRATISTAS.");
-                            authorizedBy = "RNQ";
-                        }
-                        query="insert into record (datetime_input,rut_people,rut_user,type,state,authorized_by,pension_quotes,security_elements) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','"+authorizedBy+"','false','true')";
-                    }
-                    else if(item.contains("[1]"))
-                    {
-                        qApp->beep();
-                        do
-                            authorizedBy = QInputDialog::getItem(this, tr("Ingreso Rechazado."),tr("Acceso no autorizado, requiere elementos de seguridad.\n\n Solicite autorización e indique quien autoriza:"),authorizer,0,false,&ok);
-                        while(ok && authorizedBy.isEmpty());
-                        if(ok && !authorizedBy.isEmpty())
-                        {
-                            authorizedBy = "[WITHOUT SECURITY ELEMENTS] " + authorizedBy;
-                            recordState = "O";
-                        }
-                        else
-                        {
-                            Logger::insert2Logger(rutSignin," DEBUG ", "Acceso de "+global_PERSONAL_DATA+" rechazada por no cumplir con elementos de seguridad para CONTRATISTAS.");
-                            authorizedBy = "RNS";
-                        }
-                        query="insert into record (datetime_input,rut_people,rut_user,type,state,authorized_by,pension_quotes,security_elements) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','"+authorizedBy+"','true','false')";
-                    }
-                    else // meets the requirements
-                    {
-                        recordState = "O";
-                        query="insert into record (datetime_input,rut_people,rut_user,type,state,pension_quotes,security_elements) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','true','true')";
-                    }
-                }
-                else
-                {
-                    //clean("",true);
-                }
-            }
-            else
-            {
-                if(query.isEmpty()){
-                    recordState = "O";
-                    query="insert into record (datetime_input,rut_people,rut_user,type,state) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"')";
-                }
+            if(query.isEmpty()){
+                recordState = "O";
+                query="insert into record (datetime_input,rut_people,rut_user,type,state) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"')";
             }
         }
+        //aca tengo que dejarlo
         else // Output
         {
             ui->label_type->setText("SALIDA");
@@ -1009,9 +931,10 @@ void Dashboard::handlePeople(QString device){
         }
         else
             ui->statusBar->clearMessage();
+
     }
-    delete qry;
     pr.CloseDevice();
+    delete qry;
 }
 
 void Dashboard::readFromPR()

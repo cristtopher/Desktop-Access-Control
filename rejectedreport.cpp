@@ -56,7 +56,7 @@ void RejectedReport::on_pushButton_clicked()
 
     connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
-    if(!qry->exec("select r.id,r.state,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,p.birthdate,na.name,p.cellphone,c.name,pro.name,po.name,fr.name,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour,r.type,r.datetime_input,r.datetime_output,r.patent_input,r.patent_output,us.names,r.authorized_by,r.pension_quotes,r.security_elements,r.comment from record as r left join people as p on r.rut_people=p.rut left join nationality as na on p.code_nationality=na.code left join company as c on p.rut_company=c.rut left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as fr on p.id_frequency=fr.id inner join users as us on r.rut_user=us.rut where r.datetime_input between '"+startDate+" "+startHour+"' and '"+endDate+" "+endHour+"' and r.state like 'R%'"))
+    if(!qry->exec("select r.id,r.state,r.rut_people,p.names,p.paternal_surname,p.maternal_surname,p.birthdate,na.name,p.cellphone,c.name,pro.name,po.name,fr.name,p.start_authorized_date,p.end_authorized_date,p.start_authorized_hour,p.end_authorized_hour,r.type,r.datetime_input,r.datetime_output,r.patent_input,r.patent_output,us.names,r.authorized_by,r.comment from record as r left join people as p on r.rut_people=p.rut left join nationality as na on p.code_nationality=na.code left join company as c on p.rut_company=c.rut left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as fr on p.id_frequency=fr.id inner join users as us on r.rut_user=us.rut where r.datetime_input between '"+startDate+" "+startHour+"' and '"+endDate+" "+endHour+"' and r.state like 'R%'"))
     {
         qApp->beep();
         QMessageBox::critical(this,tr("Error:"), qry->lastError().text());
@@ -84,20 +84,31 @@ void RejectedReport::on_pushButton_clicked()
         //Width
         xlsx.setColumnWidth(1,1,6.0);
         xlsx.setColumnWidth(3,3,10.0);
-        xlsx.setColumnWidth(4,6,16.0);
+        xlsx.setColumnWidth(4,4,16.0);
+        xlsx.setColumnWidth(5,5,16.0);
+        xlsx.setColumnWidth(6,6,16.0);
         xlsx.setColumnWidth(7,7,14.0);
         xlsx.setColumnWidth(8,8,16.0);
         xlsx.setColumnWidth(9,9,11.0);
-        xlsx.setColumnWidth(10,12,30.0);
+        xlsx.setColumnWidth(10,10,20.0);
+        xlsx.setColumnWidth(11,11,30.0);
+        xlsx.setColumnWidth(12,12,45.0);
         xlsx.setColumnWidth(13,13,13.0);
-        xlsx.setColumnWidth(14,17,15.0);
-        xlsx.setColumnWidth(18,18,13.0);
-        xlsx.setColumnWidth(19,20,15.0);
-        xlsx.setColumnWidth(21,22,20.0);
-        xlsx.setColumnWidth(23,23,25.0);
-        xlsx.setColumnWidth(24,24,40.0);
-        xlsx.setColumnWidth(25,26,28.0);
-        xlsx.setColumnWidth(27,27,50.0);
+        xlsx.setColumnWidth(14,14,17.0);
+        xlsx.setColumnWidth(15,15,17.0);
+        xlsx.setColumnWidth(16,16,17.0);
+        xlsx.setColumnWidth(17,17,17.0);
+        xlsx.setColumnWidth(18,18,17.0);
+        xlsx.setColumnWidth(19,19,17.0);
+        xlsx.setColumnWidth(20,20,15.0);
+        xlsx.setColumnWidth(21,21,17.0);
+        xlsx.setColumnWidth(22,22,15.0);
+        xlsx.setColumnWidth(23,23,20.0);
+        xlsx.setColumnWidth(24,24,18.0);
+        xlsx.setColumnWidth(25,25,20.0);
+        xlsx.setColumnWidth(26,26,35.0);
+        xlsx.setColumnWidth(27,27,40.0);
+        xlsx.setColumnWidth(28,28,50.0);
 
         // Titles Header
         xlsx.write(1,1,"ID",fontBold);
@@ -106,7 +117,7 @@ void RejectedReport::on_pushButton_clicked()
         xlsx.write(1,4,"NOMBRES",fontBold);
         xlsx.write(1,5,"AP. PATERNO",fontBold);
         xlsx.write(1,6,"AP. MATERNO",fontBold);
-        xlsx.write(1,7,"CUMPLEAÑO",fontBold);
+        xlsx.write(1,7,"CUMPLEAÑOS",fontBold);
         xlsx.write(1,8,"NACIONALIDAD",fontBold);
         xlsx.write(1,9,"TELEFONO",fontBold);
         xlsx.write(1,10,"EMPRESA",fontBold);
@@ -118,15 +129,16 @@ void RejectedReport::on_pushButton_clicked()
         xlsx.write(1,16,"INICIO HORA AUT",fontBold);
         xlsx.write(1,17,"FIN HORA AUT",fontBold);
         xlsx.write(1,18,"TIPO",fontBold);
-        xlsx.write(1,19,"ENTRADA",fontBold);
-        xlsx.write(1,20,"SALIDA",fontBold);
-        xlsx.write(1,21,"PATENTE ENTRADA",fontBold);
-        xlsx.write(1,22,"PATENTE SALIDA",fontBold);
-        xlsx.write(1,23,"OPERARIO",fontBold);
-        xlsx.write(1,24,"AUTORIZADO POR",fontBold);
-        xlsx.write(1,25,"CERTIFICADO COTIZACIONES",fontBold);
-        xlsx.write(1,26,"ELEMENTOS SEGURIDAD",fontBold);
-        xlsx.write(1,27,"COMENTARIO",fontBold);
+        xlsx.write(1,19,"FECHA ENTRADA",fontBold);
+        xlsx.write(1,20,"FECHA SALIDA",fontBold);
+        xlsx.write(1,21,"HORA ENTRADA",fontBold);
+        xlsx.write(1,22,"HORA SALIDA",fontBold);
+        xlsx.write(1,23,"PATENTE ENTRADA",fontBold);
+        xlsx.write(1,24,"PATENTE SALIDA",fontBold);
+        xlsx.write(1,25,"OPERARIO",fontBold);
+        xlsx.write(1,26,"AUTORIZADO POR",fontBold);
+        xlsx.write(1,27,"RAZON",fontBold);
+        xlsx.write(1,28,"COMENTARIO",fontBold);
 
         int row=2;
         QString state;
@@ -159,6 +171,8 @@ void RejectedReport::on_pushButton_clicked()
                 state = "RECHAZADO POR NO CUMPLIR REQUERIMIENTOS PREVISIONALES DE SUBCONTRATISTA";
             else if(qry->value(STATE).toString()=="RNS")
                 state = "RECHAZADO POR NO CUMPLIR REQUERIMIENTOS SEGURIDAD PARA SUBCONTRATISTA";
+            else if(qry->value(STATE).toString()=="E")
+                state = "ENROLAMIENTO";
 
             xlsx.write(row,2, state); //estado
             xlsx.write(row,3, qry->value(RUT_PEOPLE).toString()); //rut
@@ -182,28 +196,37 @@ void RejectedReport::on_pushButton_clicked()
             else
                 type = "MANUAL";
 
+            //split of datetime imput
+            QString dateTimeImput=qry->value(DATETIME_INPUT).toString();
+            QStringList dateTimeInputSplit=dateTimeImput.split(" ");
+            //split of datetime output
+            QString dateTimeOutput=qry->value(DATETIME_OUTPUT).toString();
+            QStringList dateTimeOutputSplit=dateTimeOutput.split(" ");
+            //QDateTime::fromString(qry->value(DATETIME_OUTPUT).toString(),"yyyy-MM-dd HH:mm")
+
             xlsx.write(row,18, type); //Type
-            xlsx.write(row,19, QDateTime::fromString(qry->value(DATETIME_INPUT).toString(),"yyyy-MM-dd HH:mm")); //entrada
-            xlsx.write(row,20, QDateTime::fromString(qry->value(DATETIME_OUTPUT).toString(),"yyyy-MM-dd HH:mm")); //salida
-            xlsx.write(row,21, qry->value(PATENT_INPUT).toString()); //patente entrada
-            xlsx.write(row,22, qry->value(PATENT_OUTPUT).toString()); //patente salida
-            xlsx.write(row,23, qry->value(USUARIO).toString()); //operario
-            xlsx.write(row,24, qry->value(AUTHORIZED_BY).toString()); //autorizado por
+            xlsx.write(row,19, dateTimeInputSplit.value(0)); //fecha entrada
+            xlsx.write(row,20, dateTimeOutputSplit.value(0)); //fecha salida
+            xlsx.write(row,21, dateTimeInputSplit.value(1)); //hora entrada
+            xlsx.write(row,22, dateTimeOutputSplit.value(1)); //hora salida
+            xlsx.write(row,23, qry->value(PATENT_INPUT).toString()); //patente entrada
+            xlsx.write(row,24, qry->value(PATENT_OUTPUT).toString()); //patente salida
+            xlsx.write(row,25, qry->value(USUARIO).toString()); //operario
+            //split the authorized_by in two fields
+            QString fullAuthorizer=qry->value(AUTHORIZED_BY).toString();
+            QStringList splitReason=fullAuthorizer.split(':');
+            xlsx.write(row,26,splitReason.value(1)); //Authorized By
+            if(splitReason.value(0)=="[OUT OF TIME RANGE]")
+                xlsx.write(row,27,"[RECHAZADO POR FUERA DE RANGO HORA]");
+            else
+                if(splitReason.value(0)=="[OUT OF DATE RANGE]")
+                    xlsx.write(row,27,"[RECHAZADO POR FUERA DE RANGO FECHA]");
+                else
+                    xlsx.write(row,27,splitReason.value(0)); //Reason
+
 
             state.clear();
-
-            if(qry->value(PENSION_QUOTES).toString() == "true")
-                state = "SI";
-            else if (qry->value(PENSION_QUOTES).toString() == "false")
-                state = "NO";
-            xlsx.write(row,25, state); //certificado cotizaciones
-
-            if(qry->value(SECURITY_ELEMENTS).toString()=="true")
-                state = "SI";
-            else if (qry->value(SECURITY_ELEMENTS).toString()=="false")
-                state = "NO";
-            xlsx.write(row,26, state); //elementos de seguridad
-            xlsx.write(row,27, qry->value(COMMENT).toString()); //comentario
+            xlsx.write(row,25, qry->value(COMMENT).toString()); //comentario
             row++;
 
             progress.setValue(row-2);
@@ -222,6 +245,6 @@ void RejectedReport::on_pushButton_clicked()
             QMessageBox::information(this,tr("Enorabuena"),tr("Archivo generado exitosamente."));
         }
 
-    delete qry;
+        delete qry;
     }
 }
