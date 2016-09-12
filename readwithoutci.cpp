@@ -388,7 +388,7 @@ void ReadWithoutCI::on_pushButton_register_clicked()
         else
         {
             qApp->beep();
-            QMessageBox::critical(this,tr("Error al registrar"),error1);
+         //   QMessageBox::critical(this,tr("Error al registrar"),error1);
             Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());
         }
 

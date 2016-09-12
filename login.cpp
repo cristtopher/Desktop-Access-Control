@@ -56,10 +56,10 @@ void Login::on_pushButton_open_clicked()
 				Dashboard *dash=new Dashboard(0);               
 			    dash->show();
                 close();
-                QSplashScreen *splash=new QSplashScreen;
+               /* QSplashScreen *splash=new QSplashScreen;
                 splash->setPixmap(QPixmap(":images/logo.png"));
                 splash->show();
-                QTimer::singleShot(2500,splash,SLOT(close()));
+                QTimer::singleShot(2500,splash,SLOT(close()));*/
             }
             if(count<1)
             {
