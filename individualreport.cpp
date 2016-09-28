@@ -292,7 +292,7 @@ void IndividualReport::on_pushButton_clicked()
 
                 state.clear();
 
-                xlsx.write(row,25, qry->value(COMMENT).toString()); //comentario
+                xlsx.write(row,28, qry->value(COMMENT).toString()); //comentario
                 row++;
 
                 progress.setValue(row-2);

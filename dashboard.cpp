@@ -194,6 +194,7 @@ Dashboard::Dashboard(QWidget *parent) :
     //RTScan
     RTScan = new QSerialPort(this);
     RTScan->setPortName(conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from users where rut = '"+rutSignin+"')"));
+    qDebug()<<conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from users where rut = '"+rutSignin+"')");
     if(RTScan->open(QIODevice::ReadOnly))
     {
         RTScan->setBaudRate(QSerialPort::Baud115200);
@@ -203,11 +204,13 @@ Dashboard::Dashboard(QWidget *parent) :
         RTScan->setFlowControl(QSerialPort::NoFlowControl);
         ui->label_status_lect->setPixmap(okPix);
         connect(RTScan, SIGNAL(readyRead()),this,SLOT(serialReceived()));
+        qDebug()<<RTScan->isOpen();
     }
     else
     {
         ui->label_status_lect->setPixmap(badPix);
         Logger::insert2Logger(rutSignin," ERROR ", "RTScan desconectado.");
+        qDebug()<<RTScan->isOpen();
     }
     // QString imgPath = QDir::currentPath()+"/people/" + rut + ".jpg";
     if(!QDir("people").exists())
