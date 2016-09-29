@@ -43,9 +43,10 @@
 #include "include/gxsdldr.cpp"
 #include "__lib__.h"
 
+#include <iomanip>
 #include <QProgressDialog>
 #include <QtWidgets/QApplication>
-#include <administratormenu.h>
+
 
 bool loginWindow;
 
@@ -104,7 +105,7 @@ Dashboard::Dashboard(QWidget *parent) :
 
 
     // conn.connOpen();
-
+	qDebug ()<<conn.mydb.isOpen();
     if(conn.isOpenDB())
         ui->label_status_db->setPixmap(okPix);
     else
@@ -144,7 +145,7 @@ Dashboard::Dashboard(QWidget *parent) :
     ui->comboBox_filtered->addItem("Patente Entrada","patent_input");
 
     // Set permissions
-    ui->actionAdministrarEmpresas->setEnabled(true);
+    ui->actionAdministrarEmpresas->setEnabled(false);
     ui->actionAdministrarCargos->setEnabled(false);
     ui->actionAdministrarPerfiles->setEnabled(false);
     switch (conn.getFirstFromDb(rutSignin,"select id_rol from user where rut='"+rutSignin+"'").toInt()) {
@@ -198,6 +199,7 @@ Dashboard::Dashboard(QWidget *parent) :
     //RTScan
     RTScan = new QSerialPort(this);
     RTScan->setPortName(conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from user where rut = '"+rutSignin+"')"));
+	qDebug()<<conn.getFirstFromDb(rutSignin,"select rtscan_port from configuration where key=(select key from users where rut = '"+rutSignin+"')");
     if(RTScan->open(QIODevice::ReadOnly))
     {
         RTScan->setBaudRate(QSerialPort::Baud115200);
@@ -207,12 +209,17 @@ Dashboard::Dashboard(QWidget *parent) :
         RTScan->setFlowControl(QSerialPort::NoFlowControl);
         ui->label_status_lect->setPixmap(okPix);
         connect(RTScan, SIGNAL(readyRead()),this,SLOT(serialReceived()));
+		qDebug()<<RTScan->isOpen();
     }
     else
     {
         ui->label_status_lect->setPixmap(badPix);
         Logger::insert2Logger(rutSignin," ERROR ", "RTScan desconectado.");
+		qDebug()<<RTScan->isOpen();
     }
+	// QString imgPath = QDir::currentPath()+"/people/" + rut + ".jpg";
+    if(!QDir("people").exists())
+        QDir().mkdir("people");
 }
 
 void Dashboard::loopComboScan(){
@@ -686,15 +693,16 @@ void Dashboard::handlePeople(QString device){
         //Autorizher
         QStringList authorizer;
         QSqlQuery* qury=new QSqlQuery(conn.mydb);
-        qury->prepare("select names from user where id_rol=2");
+        qury->prepare("select names,paternal_surname from user where id_rol=2");
         if(!qury->exec())
         {
             QMessageBox::critical(this,tr("ERROR"),error1);
             Logger::insert2Logger(rutSignin," ERROR ",error1);
         }
         else
-            while(qury->next())
-                authorizer << qury->value(0).toString();
+            while(qury->next()){
+                authorizer << qury->value(0).toString()+" "+qury->value(1).toString();
+				}
         delete qury;
 
         //input or output?
@@ -762,7 +770,7 @@ void Dashboard::handlePeople(QString device){
                         while(ok && authorizedBy.isEmpty());
                         if (ok)
                         {
-                            authorizedBy = "[OUT OF TIME RANGE] " + authorizedBy;
+                            authorizedBy = "[OUT OF TIME RANGE]: " + authorizedBy;
                             Logger::insert2Logger(rutSignin," DEBUG ", global_PERSONAL_DATA +" accedió en horario no autorizado ("+currentDate.toString("yyyy-MM-dd")+currentTime.toString("HH:mm")+"), fué autorizado por "+authorizedBy);
                             recordState = "O";
                         }
@@ -813,7 +821,7 @@ void Dashboard::handlePeople(QString device){
                         while(ok && authorizedBy.isEmpty());
                         if (ok)
                         {
-                            authorizedBy = "[OUT OF TIME RANGE] " + authorizedBy;
+                            authorizedBy = "[OUT OF TIME RANGE]: " + authorizedBy;
                             Logger::insert2Logger(rutSignin," DEBUG ", global_PERSONAL_DATA +" accedió en horario no autorizado ("+currentDate.toString("yyyy-MM-dd")+currentTime.toString("HH:mm")+"), fué autorizado por "+authorizedBy);
                             recordState = "O";
                         }
@@ -837,7 +845,7 @@ void Dashboard::handlePeople(QString device){
                 while(ok && authorizedBy.isEmpty());
                 if (ok)
                 {
-                    authorizedBy = "[OUT OF TIME RANGE] " + authorizedBy;
+                    authorizedBy = "[OUT OF TIME RANGE]: " + authorizedBy;
                     Logger::insert2Logger(rutSignin," DEBUG ", global_PERSONAL_DATA +" accedió en horario no autorizado ("+currentDate.toString("yyyy-MM-dd")+currentTime.toString("HH:mm")+"), fué autorizado por "+authorizedBy);
                     recordState = "O";
                 }
@@ -849,89 +857,11 @@ void Dashboard::handlePeople(QString device){
                 }
                 query="insert into record (datetime_input,rut_people,rut_user,type,state,authorized_by) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','"+authorizedBy+"')";
             }
-            if(global_PROFILE.contains("CONTRATISTA") && flag_for_rejected == false)
-            {
-                QStringList items;
-                QString item;
-                items << tr("[1] Solo obligaciones previcionales") << tr("[2] Solo elementos de seguridad") << tr("Ambos") << tr("Ninguno");
-
-                do
-                    item = QInputDialog::getItem(this, tr("Obligaciones"),tr("¿Cuenta con requerimeintos obligatotios?"), items,0,false,&ok);
-                while(item.isEmpty());
-
-                if (ok)
-                {
-                    if(item.contains("Ninguno"))
-                    {
-                        qApp->beep();
-                        do
-                            authorizedBy = QInputDialog::getItem(this, tr("Ingreso Rechazado."),tr("Acceso no autorizado por incumplimiento de obligaciones, solicite autorizacion e indique quien autoriza:"),authorizer,0,false,&ok);
-                        while(ok && authorizedBy.isEmpty());
-                        if(ok && !authorizedBy.isEmpty())
-                        {
-                            authorizedBy = "[DOES NOT MEET REQUIREMENTS] " + authorizedBy;
-                            recordState = "O";
-                        }
-                        else
-                        {
-                            Logger::insert2Logger(rutSignin," DEBUG ", "Acceso de "+global_PERSONAL_DATA+" rechazada por no cumplir requerimientos para CONTRATISTAS.");
-                            recordState = "RMR";
-                        }
-                        query="insert into record (datetime_input,rut_people,rut_user,type,state,authorized_by,pension_quotes,security_elements) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','"+authorizedBy+"','false','false')";
-                    }
-                    else if(item.contains("[2]"))
-                    {
-                        qApp->beep();
-                        do
-                            authorizedBy = QInputDialog::getItem(this, tr("Ingreso Rechazado."),tr("Acceso no autorizado, requiere certificado de obligaciones previsionales.\n\n Solicite autorización e indique quien autoriza:"),authorizer,0,false,&ok);
-                        while(ok && authorizedBy.isEmpty());
-                        if(ok && !authorizedBy.isEmpty())
-                        {
-                            authorizedBy = "[DOES NOT MEET QUOTE REQUIREMENTS] " + authorizedBy;
-                            recordState = "O";
-                        }
-                        else
-                        {
-                            Logger::insert2Logger(rutSignin," DEBUG ", "Acceso de "+global_PERSONAL_DATA+" rechazada por no cumplir requerimientos previsionales para CONTRATISTAS.");
-                            authorizedBy = "RNQ";
-                        }
-                        query="insert into record (datetime_input,rut_people,rut_user,type,state,authorized_by,pension_quotes,security_elements) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','"+authorizedBy+"','false','true')";
-                    }
-                    else if(item.contains("[1]"))
-                    {
-                        qApp->beep();
-                        do
-                            authorizedBy = QInputDialog::getItem(this, tr("Ingreso Rechazado."),tr("Acceso no autorizado, requiere elementos de seguridad.\n\n Solicite autorización e indique quien autoriza:"),authorizer,0,false,&ok);
-                        while(ok && authorizedBy.isEmpty());
-                        if(ok && !authorizedBy.isEmpty())
-                        {
-                            authorizedBy = "[WITHOUT SECURITY ELEMENTS] " + authorizedBy;
-                            recordState = "O";
-                        }
-                        else
-                        {
-                            Logger::insert2Logger(rutSignin," DEBUG ", "Acceso de "+global_PERSONAL_DATA+" rechazada por no cumplir con elementos de seguridad para CONTRATISTAS.");
-                            authorizedBy = "RNS";
-                        }
-                        query="insert into record (datetime_input,rut_people,rut_user,type,state,authorized_by,pension_quotes,security_elements) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','"+authorizedBy+"','true','false')";
-                    }
-                    else // meets the requirements
-                    {
-                        recordState = "O";
-                        query="insert into record (datetime_input,rut_people,rut_user,type,state,pension_quotes,security_elements) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"','true','true')";
-                    }
-                }
-                else
-                {
-                    //clean("",true);
-                }
-            }
-            else
-            {
+            
                 if(query.isEmpty()){
                     recordState = "O";
                     query="insert into record (datetime_input,rut_people,rut_user,type,state) values ('"+currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"', '"+global_PERSONAL_DATA+"','"+rutSignin+"','A','"+recordState+"')";
-                }
+                
             }
         }
         else // Output
@@ -1010,8 +940,9 @@ void Dashboard::handlePeople(QString device){
         else
             ui->statusBar->clearMessage();
     }
+	pr.CloseDevice();
     delete qry;
-    pr.CloseDevice();
+    
 }
 
 void Dashboard::readFromPR()
@@ -1253,7 +1184,7 @@ bool Dashboard::connectComboScan()
     }
     catch(gxException e) // e.GetErrorString()
     {
-        QMessageBox::critical(this,tr("ERROR"),tr("Comboscan no conectado, conecte y detecte desde menu herramientas."));
+        QMessageBox::warning(this,tr("ERROR"),tr("Comboscan no conectado, conecte y detecte desde menu herramientas."));
         statusBar()->showMessage("ComboScan no conectado...",5000);
         Logger::insert2Logger(rutSignin," ERROR ", QString::number(e.GetErrorCode()));
         return false;
@@ -1263,6 +1194,9 @@ bool Dashboard::connectComboScan()
 void Dashboard::on_pushButton_clicked()
 {
     readFromPR();
+	if(comboScanIsOpen()==false){
+        QMessageBox::warning(this,tr("PRECAUCION"),tr("Comboscan no conectado, conecte y detecte desde menu herramientas."));
+    }
     ui->lineEdit_pdf417->setFocus();
 }
 
@@ -1362,7 +1296,7 @@ void Dashboard::on_tableWidget_input_cellChanged(int row, int column)
 
 void Dashboard::on_actionDetectar_ComboScan_triggered()
 {
-    if(connectComboScan())
+    if(comboScanIsOpen()==true)
     {
         QPixmap okPix(":/images/ok.png");
         ui->label_status_cs->setPixmap(okPix);
@@ -1976,7 +1910,7 @@ void Dashboard::serialReceived(){
     serialData="";
     bufferSplit.clear();
     serialBuffer="";
-    // qDebug()<<"raw: "+rut;
+    qDebug()<<"raw: "+rut;
 
     if(rut.startsWith("https"))
     {
@@ -2056,6 +1990,8 @@ void Dashboard::on_pushButton_updatePic_clicked()
             user.load(pic.fileName());
             ui->label_user->setPixmap(user);
         }
+		if(!pic.exists())
+            QMessageBox::information(this,tr("INFORMACION"),"Persona sin foto, porfavor verifique la posicion del carnet");
     }
 }
 

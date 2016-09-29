@@ -104,7 +104,8 @@ void People::loadTable(QString query){
    connection conn;
     QSqlQuery* qry=new QSqlQuery(conn.mydb);
     if(query=="default")
-        qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
+       // qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as 'Apellido Paterno',p.maternal_surname as 'Apellido Materno',c.name as Empresa,(CASE WHEN p.state == 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
+		qry->prepare("select p.rut as Rut,p.names as Nombres,p.paternal_surname as Apellido_Paterno,p.maternal_surname as Apellido_Materno,c.name as Empresa,(CASE WHEN p.state = 'A' THEN 'ACTIVO' ELSE 'INACTIVO' END) as Estado,n.name as Nacionalidad,p.start_authorized_hour,p.end_authorized_hour,p.start_authorized_date,p.end_authorized_date,p.cellphone as Telefono,p.email as Correo,po.name as Cargo,pro.name as Perfil,p.picture as Imagen,f.name as Frecuencia from people as p left join company as c on p.rut_company=c.rut left join nationality as n on p.code_nationality=n.code left join position as po on p.id_position=po.id left join profile as pro on p.id_profile=pro.id left join frequency as f on p.id_frequency=f.id");
     else
         qry->prepare(query);
     if(!qry->exec())
@@ -414,6 +415,7 @@ void People::on_pushButton_update_clicked()
     QString cellphone = ui->lineEdit_cellphone->text();
     QString email = ui->lineEdit_email->text();
 
+	if(!ui->lineEdit_rut->text().isEmpty()){
    if(!qry->exec("UPDATE people SET names='"+ui->lineEdit_names->text()+
                  "',paternal_surname='"+ui->lineEdit_paternal_surname->text()+"',maternal_surname='"+ui->lineEdit_maternal_surname->text()+
                  "',birthdate='"+ui->dateEdit_birthdate->text()+"',email='"+email+"',cellphone='"+
@@ -432,6 +434,8 @@ void People::on_pushButton_update_clicked()
         ui->dateEdit_start->setDate(QDate::fromString(conn.getFirstFromDb(rutSignin,"select start_authorized_date from people where rut = '"+ui->lineEdit_rut->text()+"'")));
         ui->dateEdit_end->setDate(QDate::fromString(conn.getFirstFromDb(rutSignin,"select end_authorized_date from people where rut = '"+ui->lineEdit_rut->text()+"'")));
     }
+   }else
+        QMessageBox::information(this,"PRECAUCION", tr("Campo RUT vacio,porfavor Verifique"));
     delete qry;
     loadTable("default");
 }

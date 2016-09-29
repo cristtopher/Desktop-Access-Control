@@ -138,7 +138,7 @@ QString ReadWithoutCI::verifyPeople()
         //Autorizher
         QStringList authorizer;
         QSqlQuery* qury=new QSqlQuery(conn.mydb);
-        qury->prepare("select names from user where id_rol=2");
+        qury->prepare("select names,paternal_surname from user where id_rol=2");
         if(!qury->exec())
         {
             QMessageBox::critical(this,tr("ERROR"),error1);
@@ -146,7 +146,7 @@ QString ReadWithoutCI::verifyPeople()
         }
         else
             while(qury->next())
-                authorizer << qury->value(0).toString();
+                authorizer << qury->value(0).toString()+" "+qury->value(1).toString();
         delete qury;
 
         if(state == "I") //People Inactive.
@@ -205,7 +205,7 @@ QString ReadWithoutCI::verifyPeople()
                 while(ok && authorizedBy.isEmpty());
                 if (ok)
                 {
-                    authorizedBy = "[OUT OF TIME RANGE] " + authorizedBy;
+                    authorizedBy = "[RECHAZADO POR FUERA DE RANGO HORA]: " + authorizedBy;
                     Logger::insert2Logger(rutSignin," DEBUG ", ui->lineEdit_rut->text() +" accedió en horario no autorizado ("+currentDate.toString("yyyy-MM-dd")+currentTime.toString("HH:mm")+"), fué autorizado por "+authorizedBy);
                     recordState = "O";
                 }
@@ -261,7 +261,7 @@ QString ReadWithoutCI::verifyPeople()
                     while(ok && authorizedBy.isEmpty());
                     if (ok)
                     {
-                        authorizedBy = "[OUT OF TIME RANGE] " + authorizedBy;
+                        authorizedBy = "[RECHAZADO POR FUERA DE RANGO HORA]: " + authorizedBy;
                         Logger::insert2Logger(rutSignin," DEBUG ", ui->lineEdit_rut->text() +" accedió en horario no autorizado ("+currentDate.toString("yyyy-MM-dd")+currentTime.toString("HH:mm")+"), fué autorizado por "+authorizedBy);
                         recordState = "O";
                     }
@@ -316,7 +316,7 @@ QString ReadWithoutCI::verifyPeople()
             while(ok && authorizedBy.isEmpty());
             if (ok)
             {
-                authorizedBy = "[OUT OF TIME RANGE] " + authorizedBy;
+                authorizedBy = "[RECHAZADO POR FUERA DE RANGO HORA]: " + authorizedBy;
                 Logger::insert2Logger(rutSignin," DEBUG ", ui->lineEdit_rut->text() +" accedió en horario no autorizado ("+currentDate.toString("yyyy-MM-dd")+currentTime.toString("HH:mm")+
                                       "), fué autorizado por "+authorizedBy);
                 recordState = "O";
@@ -332,54 +332,10 @@ QString ReadWithoutCI::verifyPeople()
         }
         else
         {
-            if(ui->lineEdit_profile->text().contains("CONTRATISTA"))
-            {
-                QString security = "true"; //For some reason not working with bool type. (pending)
-                QString pension = "true";
-                int satisfy = 0;
-                if(ui->checkBox_security->isChecked())
-                    if(ui->checkBox_pension->isChecked())
-                        satisfy=1;
-                    else
-                    {
-                        satisfy=0;
-                        pension="false";
-                    }
-                else
-                {
-                    security="false";
-                    satisfy=0;
-                }
-                QString authorizedBy;
-                bool ok;
-                if(satisfy==0)
-                {
-                    qApp->beep();
-                    do
-                        authorizedBy = QInputDialog::getItem(this, tr("Ingreso Rechazado."),tr("Acceso no autorizado por incumplimiento de obligaciones, solicite autorizacion e indique quien autoriza:"),authorizer,0,false,&ok);
-                    while(ok && authorizedBy.isEmpty());
-                    if (ok){
-                        return "insert into record (datetime_input,rut_people,rut_user,type,state,comment,patent_input,patent_output,authorized_by,pension_quotes,security_elements) values ('"
-                                +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
-                                +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"','"+authorizedBy+"','"+pension+"','"+security+"')";
-                    }
-                    else{
-                        // creo que hay que limpiar
-                    }
-                }
-                else
-                {
-                    return "insert into record (datetime_input,rut_people,rut_user,type,state,comment,patent_input,patent_output,pension_quotes,security_elements) values ('"
-                            +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
-                            +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"','"+pension+"','"+security+"')";
-                }
-            }
-            else
-            {
                 return "insert into record (datetime_input,rut_people,rut_user,type,state,comment,patent_input,patent_output) values ('"
                         +currentDate.toString("yyyy-MM-dd")+" "+currentTime.toString("HH:mm")+"','"+ui->lineEdit_rut->text()+"','"+rutSignin+"','M','O','"
                         +ui->lineEdit_comment->text()+"','"+ui->lineEdit_patent_input->text()+"','"+ui->lineEdit_patent_output->text()+"')";
-            }
+            
         }
     }
 }
@@ -393,6 +349,7 @@ void ReadWithoutCI::on_pushButton_register_clicked()
         QSqlQuery* qry=new QSqlQuery(conn.mydb);
 
         int inputCurrentIndex = ui->listView_imput->currentIndex().row();
+		qDebug()<<hasInput;
         if(hasInput)
         {
             if(inputCurrentIndex < 0)
@@ -400,6 +357,10 @@ void ReadWithoutCI::on_pushButton_register_clicked()
 
                 QMessageBox::warning(this,tr("Advertencia"),tr("Este usuario contiene registros de entrada sin salida, favor registrar salida manual antes de continuar."));
                 ui->listView_imput->setFocus();
+				qDebug()<<ui->listView_imput->currentIndex();
+				//ui->listView_imput->setCurrentIndex(ui->listView_imput->model()->index(0,0));
+                QModelIndex Index= ui->listView_imput->model()->index(0,0);
+                ui->listView_imput->selectionModel()->select( Index, QItemSelectionModel::Select );
                 Logger::insert2Logger(rutSignin," ERROR ", "Se ha intentado registrar entrada del usuario " +ui->lineEdit_rut->text()+" que contiene ingresos previos.");
             }
             else{
@@ -412,8 +373,8 @@ void ReadWithoutCI::on_pushButton_register_clicked()
                                  ui->lineEdit_patent_output->text()+"',comment=comment ||', "+ui->lineEdit_comment->text()+"' where datetime_input='"+
                                  ui->listView_imput->currentIndex().data().toString()+"' and rut_people='"+ui->lineEdit_rut->text()+"'");
             }
-        }
-        else
+        
+		}else
                 qry->prepare(verifyPeople());
         if(qry->exec())
         {
@@ -424,7 +385,7 @@ void ReadWithoutCI::on_pushButton_register_clicked()
         else
         {
             qApp->beep();
-            QMessageBox::critical(this,tr("Error al registrar"),error1);
+         //   QMessageBox::critical(this,tr("Error al registrar"),error1);
             Logger::insert2Logger(rutSignin, " ERROR ", qry->lastError().text()+" -> "+qry->executedQuery());
         }
         delete qry;
@@ -493,10 +454,14 @@ void ReadWithoutCI::on_lineEdit_patent_output_editingFinished()
 
 void ReadWithoutCI::on_lineEdit_patent_input_editingFinished()
 {
-    ui->lineEdit_patent_input->setText(ui->lineEdit_patent_input->text().toUpper());
+    //ui->lineEdit_patent_input->setText(ui->lineEdit_patent_input->text().toUpper());
 }
 
 void ReadWithoutCI::on_lineEdit_comment_editingFinished()
 {
     ui->lineEdit_comment->setText(ui->lineEdit_comment->text().toUpper());
+}
+void ReadWithoutCI::on_lineEdit_patent_input_textChanged(const QString &arg1)
+{
+    ui->lineEdit_patent_input->setText(ui->lineEdit_patent_input->text().toUpper());
 }

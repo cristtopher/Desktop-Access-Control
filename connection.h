@@ -6,6 +6,7 @@
 #include <QString>
 #include "logger.h"
 #include <QMessageBox>
+#include <qsqldatabase.h>
 
 extern QString rutSignin;
 extern QString error0;
